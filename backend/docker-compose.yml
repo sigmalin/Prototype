@@ -1,0 +1,52 @@
+# 使用版本 3.3
+version: '3.3'
+
+#定義 service 的區塊，一個 service 設定可以用來啟動多個容器
+services:
+    #定義啟動的容器名稱
+    go_api:  
+        #image 來源
+        image: service/gosql
+        container_name: GoAPI
+        #等待指定container完成啟動 在運行
+        depends_on:
+            - go_db
+            - go_redis
+        #開放的 Port
+        ports:
+            - 1234:1234
+        #環境變數
+        environment:
+            API_PORT: :1234
+            SQL_DRIVER: mysql
+            SQL_USERNAME: root
+            SQL_PASSWORD: 1111
+            SQL_ADDRESS: go_db
+            SQL_PORT: 3306
+            SQL_DATABASE: main_db
+            SQL_TIMEOUT: 5
+            SQL_MAXLIFETIME: 10
+            SQL_MAXOPENCONNECT: 1
+            SQL_MAXIDLECONNECT: 1
+            SQL_RETRYMAX: 10
+            SQL_RETRYINTERVAL: 3
+            REDIS_ADDRESS: go_redis
+            REDIS_PORT: 6379
+            SESSION_NAME: SIGMA_SESSION_KEY
+            SESSION_EXPIRATION: 300
+    #定義啟動的DB名稱
+    go_db:
+        image: mariadb
+        container_name: GoDatabase
+        ports:
+            - 37002:3306
+        volumes:
+            - ./data:/var/lib/mysql
+        environment:
+            MYSQL_ROOT_PASSWORD: 1111            
+    #定義啟動的Redis
+    go_redis:
+        image: redis
+        container_name: GoRedis
+        ports:
+            - 37003:6379
