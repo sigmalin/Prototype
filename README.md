@@ -23,7 +23,7 @@
 
     - info :
 
-        前端代碼資料夾，使用 golang 實作
+        後端代碼資料夾，使用 golang 實作
 
     - logs :
 
