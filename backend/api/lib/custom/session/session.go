@@ -1,4 +1,4 @@
-package main
+package session
 
 import (
 	"crypto/rand"
@@ -83,12 +83,12 @@ func (mgr *SessionManager) SessionDestroy(w http.ResponseWriter, r *http.Request
 	}
 }
 
-func (mgr *SessionManager) GC() {
+func (mgr *SessionManager) GC(expires int) {
 	mgr.lock.Lock()
 	defer mgr.lock.Unlock()
 
-	mgr.provider.SessionGC(SESSION_EXPIRATION)
-	time.AfterFunc(time.Duration(SESSION_EXPIRATION)*time.Second, func() { mgr.GC() })
+	mgr.provider.SessionGC(expires)
+	time.AfterFunc(time.Duration(expires)*time.Second, func() { mgr.GC(expires) })
 }
 
 func (mgr *SessionManager) sessionId() string {

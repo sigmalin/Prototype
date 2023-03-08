@@ -1,4 +1,4 @@
-package main
+package code
 
 const (
 	SUCCESS        int = 0

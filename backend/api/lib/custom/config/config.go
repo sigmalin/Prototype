@@ -1,4 +1,4 @@
-package main
+package config
 
 import (
 	"os"
@@ -43,8 +43,6 @@ func init() {
 	SQL_MAXLIFETIME = string2int(os.Getenv("SQL_MAXLIFETIME"))
 	SQL_MAXOPENCONNECT = string2int(os.Getenv("SQL_MAXOPENCONNECT"))
 	SQL_MAXIDLECONNECT = string2int(os.Getenv("SQL_MAXIDLECONNECT"))
-	SQL_RETRYMAX = string2int(os.Getenv("SQL_RETRYMAX"))
-	SQL_RETRYINTERVAL = time.Duration(string2int(os.Getenv("SQL_RETRYINTERVAL"))) * time.Second
 
 	REDIS_ADDRESS = os.Getenv("REDIS_ADDRESS")
 	REDIS_PORT = string2int(os.Getenv("REDIS_PORT"))

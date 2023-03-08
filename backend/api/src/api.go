@@ -6,9 +6,23 @@ import (
 	"io"
 	"log"
 	"net/http"
+
+	"custom/config"
+
+	"custom/response"
+	"custom/response/code"
+	_ "custom/response/simple"
+
+	"custom/session"
+	_ "custom/session/redis"
+
+	"custom/connect/db"
 )
 
-var GetResponse func(w http.ResponseWriter, r *http.Request) IResponse
+type Response = response.Response
+type SessionManager = session.SessionManager
+
+var responseFactory func(w http.ResponseWriter, r *http.Request) response.Response
 var SessionMgr *SessionManager
 
 func apiService() {
@@ -26,10 +40,10 @@ func apiService() {
 	http.HandleFunc("/Form", handleForm)
 
 	// Run the HTTP server using the bound certificate and key for TLS
-	if err := http.ListenAndServe(API_PORT, nil); err != nil {
+	if err := http.ListenAndServe(config.API_PORT, nil); err != nil {
 		log.Print("HTTP server failed to run")
 	} else {
-		log.Printf("HTTP server is running on port %s", API_PORT)
+		log.Printf("HTTP server is running on port %s", config.API_PORT)
 	}
 }
 
@@ -37,8 +51,8 @@ func initResponse() {
 
 	const responseType = "simple"
 
-	GetResponse = responses[responseType]
-	if GetResponse == nil {
+	responseFactory = response.GetFactory(responseType)
+	if responseFactory == nil {
 		log.Fatal(fmt.Errorf("cannot get response : %s", responseType))
 	}
 }
@@ -47,52 +61,52 @@ func initSession() {
 
 	const providerType = "redis"
 
-	mgr, err := CreateSessionManager(providerType, SESSION_NAME)
+	mgr, err := session.CreateSessionManager(providerType, config.SESSION_NAME)
 	if err != nil {
 		log.Fatal(fmt.Errorf("cannot get session : %s", providerType))
 	}
 
 	SessionMgr = mgr
-	go SessionMgr.GC()
+	go SessionMgr.GC(config.SESSION_EXPIRATION)
 }
 
 // Let / return Healthy and status code 200
 func handleRoot(w http.ResponseWriter, r *http.Request) {
 
-	res := GetResponse(w, r)
+	res := responseFactory(w, r)
 	res.Message()
 }
 
 func handleQuery(w http.ResponseWriter, r *http.Request) {
 
-	res := GetResponse(w, r)
+	res := responseFactory(w, r)
 
 	r.ParseForm()
 	name := r.PostFormValue("name")
 
-	ctx, cancel := context.WithTimeout(r.Context(), SQL_TIMEOUT)
+	ctx, cancel := context.WithTimeout(r.Context(), config.SQL_TIMEOUT)
 	defer cancel()
 
-	queryUsers(MainDB, res, ctx, name)
+	queryUsers(db.GetDB(config.SQL_DATABASE), res, ctx, name)
 }
 
 func handleDebug(w http.ResponseWriter, r *http.Request) {
 
-	res := GetResponse(w, r)
+	res := responseFactory(w, r)
 
-	ctx, cancel := context.WithTimeout(r.Context(), SQL_TIMEOUT)
+	ctx, cancel := context.WithTimeout(r.Context(), config.SQL_TIMEOUT)
 	defer cancel()
 
-	querySleep(MainDB, res, ctx)
+	querySleep(db.GetDB(config.SQL_DATABASE), res, ctx)
 }
 
 func handleSignin(w http.ResponseWriter, r *http.Request) {
 
-	res := GetResponse(w, r)
+	res := responseFactory(w, r)
 
 	if err := r.ParseForm(); err != nil {
 		log.Print(err)
-		res.Error(UNKNOWN_ERROR, "ParseForm Failure")
+		res.Error(code.UNKNOWN_ERROR, "ParseForm Failure")
 		return
 	}
 
@@ -100,16 +114,16 @@ func handleSignin(w http.ResponseWriter, r *http.Request) {
 	email := r.PostFormValue("email")
 	password := r.PostFormValue("password")
 	if name == "" || email == "" || password == "" {
-		res.Error(INPUT_FAIURE, "mismatch input argument")
+		res.Error(code.INPUT_FAIURE, "mismatch input argument")
 		return
 	}
 
-	ctx, cancel := context.WithTimeout(r.Context(), SQL_TIMEOUT)
+	ctx, cancel := context.WithTimeout(r.Context(), config.SQL_TIMEOUT)
 	defer cancel()
 
-	userID, err := ExecSignin(MainDB, ctx, name, email, password)
+	userID, err := ExecSignin(db.GetDB(config.SQL_DATABASE), ctx, name, email, password)
 	if err != nil {
-		res.Error(SIGNIN_FAIURE, fmt.Sprintf("Cannot create user %s", email))
+		res.Error(code.SIGNIN_FAIURE, fmt.Sprintf("Cannot create user %s", email))
 		return
 	}
 
@@ -121,31 +135,31 @@ func handleSignin(w http.ResponseWriter, r *http.Request) {
 
 func handleLogin(w http.ResponseWriter, r *http.Request) {
 
-	res := GetResponse(w, r)
+	res := responseFactory(w, r)
 
 	if err := r.ParseForm(); err != nil {
 		log.Print(err)
-		res.Error(UNKNOWN_ERROR, "ParseForm Failure")
+		res.Error(code.UNKNOWN_ERROR, "ParseForm Failure")
 		return
 	}
 
 	email := r.PostFormValue("email")
 	password := r.PostFormValue("password")
 	if email == "" || password == "" {
-		res.Error(INPUT_FAIURE, "mismatch input argument")
+		res.Error(code.INPUT_FAIURE, "mismatch input argument")
 		return
 	}
 
-	ctx, cancel := context.WithTimeout(r.Context(), SQL_TIMEOUT)
+	ctx, cancel := context.WithTimeout(r.Context(), config.SQL_TIMEOUT)
 	defer cancel()
 
-	userID, err := QueryLogin(MainDB, ctx, email, password)
+	userID, err := QueryLogin(db.GetDB(config.SQL_DATABASE), ctx, email, password)
 	if err != nil {
-		res.Error(DATA_NOT_FIND, fmt.Sprintf("Cannot find user %s", email))
+		res.Error(code.DATA_NOT_FIND, fmt.Sprintf("Cannot find user %s", email))
 		return
 	}
 
-	if err := UpdateLoginTime(MainDB, ctx, userID); err != nil {
+	if err := UpdateLoginTime(db.GetDB(config.SQL_DATABASE), ctx, userID); err != nil {
 		log.Printf("UpdateLoginTime Failure : %s", err.Error())
 	}
 
@@ -157,11 +171,11 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 
 func handleSession(w http.ResponseWriter, r *http.Request) {
 
-	res := GetResponse(w, r)
+	res := responseFactory(w, r)
 
 	session, err := SessionMgr.SessionRead(w, r)
 	if err != nil {
-		res.Error(SESSION_FAIURE, err.Error())
+		res.Error(code.SESSION_FAIURE, err.Error())
 		return
 	}
 

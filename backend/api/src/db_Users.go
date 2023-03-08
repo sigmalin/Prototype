@@ -4,6 +4,9 @@ import (
 	"context"
 	"database/sql"
 	"log"
+
+	"custom/response"
+	"custom/response/code"
 )
 
 /*
@@ -19,11 +22,11 @@ type User struct {
 }
 
 /*
-func queryAllUsers(db *sql.DB, res IResponse, ctx context.Context) string {
+func queryAllUsers(db *sql.DB, res Response, ctx context.Context) string {
 	rows, err := db.QueryContext(ctx, "SELECT * From Users")
 	if err != nil {
 		log.Print("[queryAllUsers] : ", err)
-		res.Error(UNKNOWN_ERROR, err.Error())
+		res.Error(globalVar.UNKNOWN_ERROR, err.Error())
 		return
 	}
 	defer rows.Close()
@@ -34,7 +37,7 @@ func queryAllUsers(db *sql.DB, res IResponse, ctx context.Context) string {
 		u := &User{}
 		if err := rows.Scan(&u.Name, &u.Mail); err != nil {
 			log.Print("[queryAllUsers] : ", err)
-			res.Error(UNKNOWN_ERROR, err.Error())
+			res.Error(globalVar.UNKNOWN_ERROR, err.Error())
 			return
 		}
 		users = append(users, *u)
@@ -43,7 +46,7 @@ func queryAllUsers(db *sql.DB, res IResponse, ctx context.Context) string {
 	err = rows.Err()
 	if err != nil {
 		log.Print("[queryAllUsers] : ", err)
-		res.Error(UNKNOWN_ERROR, err.Error())
+		res.Error(globalVar.UNKNOWN_ERROR, err.Error())
 		return
 	}
 
@@ -52,11 +55,11 @@ func queryAllUsers(db *sql.DB, res IResponse, ctx context.Context) string {
 }
 */
 
-func queryUsers(db *sql.DB, res IResponse, ctx context.Context, name string) {
+func queryUsers(db *sql.DB, res Response, ctx context.Context, name string) {
 	rows, err := db.QueryContext(ctx, "SELECT * From Users Where Name = ?", name)
 	if err != nil {
 		log.Print("[queryAllUsers] : ", err)
-		res.Error(UNKNOWN_ERROR, err.Error())
+		res.Error(code.UNKNOWN_ERROR, err.Error())
 		return
 	}
 	defer rows.Close()
@@ -67,7 +70,7 @@ func queryUsers(db *sql.DB, res IResponse, ctx context.Context, name string) {
 		u := &User{}
 		if err := rows.Scan(&u.Name, &u.Mail); err != nil {
 			log.Print("[queryAllUsers] : ", err)
-			res.Error(UNKNOWN_ERROR, err.Error())
+			res.Error(code.UNKNOWN_ERROR, err.Error())
 			return
 		}
 		users = append(users, *u)
@@ -76,7 +79,7 @@ func queryUsers(db *sql.DB, res IResponse, ctx context.Context, name string) {
 	err = rows.Err()
 	if err != nil {
 		log.Print("[queryAllUsers] : ", err)
-		res.Error(UNKNOWN_ERROR, err.Error())
+		res.Error(code.UNKNOWN_ERROR, err.Error())
 		return
 	}
 
@@ -84,11 +87,11 @@ func queryUsers(db *sql.DB, res IResponse, ctx context.Context, name string) {
 	res.Message()
 }
 
-func querySleep(db *sql.DB, res IResponse, ctx context.Context) {
+func querySleep(db *sql.DB, res response.Response, ctx context.Context) {
 	rows, err := db.QueryContext(ctx, "SELECT sleep(15)")
 	if err != nil {
 		log.Print("[queryAllUsers] : ", err)
-		res.Error(UNKNOWN_ERROR, err.Error())
+		res.Error(code.UNKNOWN_ERROR, err.Error())
 		return
 	}
 	defer rows.Close()
@@ -99,7 +102,7 @@ func querySleep(db *sql.DB, res IResponse, ctx context.Context) {
 		u := &User{}
 		if err := rows.Scan(&u.Name, &u.Mail); err != nil {
 			log.Print("[queryAllUsers] : ", err)
-			res.Error(UNKNOWN_ERROR, err.Error())
+			res.Error(code.UNKNOWN_ERROR, err.Error())
 			return
 		}
 		users = append(users, *u)
@@ -108,7 +111,7 @@ func querySleep(db *sql.DB, res IResponse, ctx context.Context) {
 	err = rows.Err()
 	if err != nil {
 		log.Print("[queryAllUsers] : ", err)
-		res.Error(UNKNOWN_ERROR, err.Error())
+		res.Error(code.UNKNOWN_ERROR, err.Error())
 	}
 
 	res.Add("data", users)

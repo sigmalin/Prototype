@@ -1,12 +1,18 @@
-package main
+package redis
 
 import (
 	"fmt"
 	"log"
 	"sync"
 
+	"custom/config"
+	connector "custom/connect/redis"
+	"custom/session"
+
 	"github.com/go-redis/redis"
 )
+
+type Session = session.Session
 
 type redisSession struct {
 	sid    string
@@ -14,7 +20,7 @@ type redisSession struct {
 }
 
 func (rs *redisSession) Set(value interface{}) error {
-	return rs.client.Set(rs.sid, value, SESSION_DURATION).Err()
+	return rs.client.Set(rs.sid, value, config.SESSION_DURATION).Err()
 }
 
 func (rs *redisSession) Get() interface{} {
@@ -45,7 +51,7 @@ func (rs *redisSession) Update() error {
 		return fmt.Errorf("session not exist")
 	}
 
-	_, err2 := rs.client.Expire(rs.sid, SESSION_DURATION).Result()
+	_, err2 := rs.client.Expire(rs.sid, config.SESSION_DURATION).Result()
 	return err2
 }
 
@@ -82,28 +88,16 @@ func (rp *redisProvider) SessionGC(expires int) {
 
 }
 
-func (rp *redisProvider) redisConnect() {
-	conn := fmt.Sprintf("%s:%d", REDIS_ADDRESS, REDIS_PORT)
+// init
+func init() {
 
-	client := redis.NewClient(&redis.Options{
-		Addr:     conn,
-		Password: "",
-		DB:       0,
-	})
-
-	_, err := client.Ping().Result()
+	client, err := connector.GetRedisClient(0)
 	if err != nil {
-		log.Fatal(err)
+		log.Printf("connect session redis failure!")
+		return
 	}
 
-	rp.redisClient = client
-}
+	provider := &redisProvider{redisClient: client}
 
-// init
-func initSessionProvider() {
-
-	provider := &redisProvider{}
-	provider.redisConnect()
-
-	RegisterSessionProvider("redis", provider)
+	session.RegisterSessionProvider("redis", provider)
 }

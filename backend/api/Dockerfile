@@ -3,8 +3,17 @@
 #Server 的安裝環境 設定安裝環境為 builder
 FROM golang:1.19-alpine as builder
 
+#設定中繼影像標籤 之後使用指令 docker image prune --filter label=stage=gobuilder -f 手動移除這些中繼影像
+LABEL stage=gobuilder
+
 #Dockerfile 作者
 MAINTAINER Sigma
+
+#設定 GOROOT 位置(環境預設值)
+ENV GOROOT=/usr/local/go
+
+#複製 golang 自訂 package 到 $GOROOT/src 下
+COPY lib/         ${GOROOT}/src
 
 #複製 golang 檔案 到 Container 內的指定目錄 (包含 go.mod(必要), go.sum(根據專案產生))
 COPY src/         /src
