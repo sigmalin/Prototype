@@ -1,7 +1,6 @@
 package simple
 
 import (
-	"custom/response"
 	"custom/response/code"
 	"encoding/json"
 	"io"
@@ -56,11 +55,6 @@ func (r SimpleResponse) Message() error {
 	return err
 }
 
-func GetSimpleResponse(w http.ResponseWriter, r *http.Request) response.Response {
+func NewResponse(w http.ResponseWriter, r *http.Request) SimpleResponse {
 	return SimpleResponse{writer: w, request: r, data: dict{}}
-}
-
-// init
-func init() {
-	response.RegisterFactory("simple", GetSimpleResponse)
 }

@@ -11,7 +11,8 @@ import (
 
 	"custom/response"
 	"custom/response/code"
-	_ "custom/response/simple"
+
+	"custom/response/simple/arguments"
 
 	"custom/session"
 	_ "custom/session/redis"
@@ -22,12 +23,10 @@ import (
 type Response = response.Response
 type SessionManager = session.SessionManager
 
-var responseFactory func(w http.ResponseWriter, r *http.Request) response.Response
 var SessionMgr *SessionManager
 
 func apiService() {
 
-	initResponse()
 	initSession()
 
 	// Serve 200 status on / for k8s health checks
@@ -47,16 +46,6 @@ func apiService() {
 	}
 }
 
-func initResponse() {
-
-	const responseType = "simple"
-
-	responseFactory = response.GetFactory(responseType)
-	if responseFactory == nil {
-		log.Fatal(fmt.Errorf("cannot get response : %s", responseType))
-	}
-}
-
 func initSession() {
 
 	const providerType = "redis"
@@ -70,16 +59,20 @@ func initSession() {
 	go SessionMgr.GC(config.SESSION_EXPIRATION)
 }
 
+func getArguments(w http.ResponseWriter, r *http.Request) response.Arguments {
+	return arguments.SimpleResponseArguments{Writer: w, Request: r}
+}
+
 // Let / return Healthy and status code 200
 func handleRoot(w http.ResponseWriter, r *http.Request) {
 
-	res := responseFactory(w, r)
+	res := response.GetResponse(getArguments(w, r))
 	res.Message()
 }
 
 func handleQuery(w http.ResponseWriter, r *http.Request) {
 
-	res := responseFactory(w, r)
+	res := response.GetResponse(getArguments(w, r))
 
 	r.ParseForm()
 	name := r.PostFormValue("name")
@@ -92,7 +85,7 @@ func handleQuery(w http.ResponseWriter, r *http.Request) {
 
 func handleDebug(w http.ResponseWriter, r *http.Request) {
 
-	res := responseFactory(w, r)
+	res := response.GetResponse(getArguments(w, r))
 
 	ctx, cancel := context.WithTimeout(r.Context(), config.SQL_TIMEOUT)
 	defer cancel()
@@ -102,7 +95,7 @@ func handleDebug(w http.ResponseWriter, r *http.Request) {
 
 func handleSignin(w http.ResponseWriter, r *http.Request) {
 
-	res := responseFactory(w, r)
+	res := response.GetResponse(getArguments(w, r))
 
 	if err := r.ParseForm(); err != nil {
 		log.Print(err)
@@ -135,7 +128,7 @@ func handleSignin(w http.ResponseWriter, r *http.Request) {
 
 func handleLogin(w http.ResponseWriter, r *http.Request) {
 
-	res := responseFactory(w, r)
+	res := response.GetResponse(getArguments(w, r))
 
 	if err := r.ParseForm(); err != nil {
 		log.Print(err)
@@ -171,7 +164,7 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 
 func handleSession(w http.ResponseWriter, r *http.Request) {
 
-	res := responseFactory(w, r)
+	res := response.GetResponse(getArguments(w, r))
 
 	session, err := SessionMgr.SessionRead(w, r)
 	if err != nil {
