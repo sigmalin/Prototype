@@ -3,16 +3,16 @@ package main
 import (
 	"context"
 	"fmt"
-	"io"
 	"log"
-	"net/http"
+
+	"github.com/gin-gonic/gin"
 
 	"custom/config"
 
 	"custom/response"
 	"custom/response/code"
 
-	"custom/response/simple/arguments"
+	"custom/response/gin/arguments"
 
 	"custom/session"
 	_ "custom/session/redis"
@@ -29,21 +29,7 @@ func apiService() {
 
 	initSession()
 
-	// Serve 200 status on / for k8s health checks
-	http.HandleFunc("/", handleRoot)
-	http.HandleFunc("/Debug", handleDebug)
-	http.HandleFunc("/Query", handleQuery)
-	http.HandleFunc("/Signin", handleSignin)
-	http.HandleFunc("/Login", handleLogin)
-	http.HandleFunc("/Session", handleSession)
-	http.HandleFunc("/Form", handleForm)
-
-	// Run the HTTP server using the bound certificate and key for TLS
-	if err := http.ListenAndServe(config.API_PORT, nil); err != nil {
-		log.Print("HTTP server failed to run")
-	} else {
-		log.Printf("HTTP server is running on port %s", config.API_PORT)
-	}
+	initService()
 }
 
 func initSession() {
@@ -59,59 +45,70 @@ func initSession() {
 	go SessionMgr.GC(config.SESSION_EXPIRATION)
 }
 
-func getArguments(w http.ResponseWriter, r *http.Request) response.Arguments {
-	return arguments.SimpleResponseArguments{Writer: w, Request: r}
+func initService() {
+	engine := gin.Default()
+
+	engine.GET("/", handleRoot)
+	engine.GET("/Debug", handleDebug)
+
+	engine.POST("/Query", handleQuery)
+	engine.POST("/Signin", handleSignin)
+	engine.POST("/Login", handleLogin)
+	engine.POST("/Session", handleSession)
+
+	if err := engine.Run(config.API_PORT); err != nil {
+		log.Print("HTTP server failed to run")
+	} else {
+		log.Printf("HTTP server is running on port %s", config.API_PORT)
+	}
+}
+
+func getArguments(c *gin.Context) response.Arguments {
+	return arguments.GinResponseArguments{Context: c}
 }
 
 // Let / return Healthy and status code 200
-func handleRoot(w http.ResponseWriter, r *http.Request) {
+func handleRoot(c *gin.Context) {
 
-	res := response.GetResponse(getArguments(w, r))
+	res := response.GetResponse(getArguments(c))
 	res.Message()
 }
 
-func handleQuery(w http.ResponseWriter, r *http.Request) {
+func handleQuery(c *gin.Context) {
 
-	res := response.GetResponse(getArguments(w, r))
+	res := response.GetResponse(getArguments(c))
 
-	r.ParseForm()
-	name := r.PostFormValue("name")
+	name := c.PostForm("name")
 
-	ctx, cancel := context.WithTimeout(r.Context(), config.SQL_TIMEOUT)
+	ctx, cancel := context.WithTimeout(c.Request.Context(), config.SQL_TIMEOUT)
 	defer cancel()
 
 	queryUsers(db.GetDB(config.SQL_DATABASE), res, ctx, name)
 }
 
-func handleDebug(w http.ResponseWriter, r *http.Request) {
+func handleDebug(c *gin.Context) {
 
-	res := response.GetResponse(getArguments(w, r))
+	res := response.GetResponse(getArguments(c))
 
-	ctx, cancel := context.WithTimeout(r.Context(), config.SQL_TIMEOUT)
+	ctx, cancel := context.WithTimeout(c.Request.Context(), config.SQL_TIMEOUT)
 	defer cancel()
 
 	querySleep(db.GetDB(config.SQL_DATABASE), res, ctx)
 }
 
-func handleSignin(w http.ResponseWriter, r *http.Request) {
+func handleSignin(c *gin.Context) {
 
-	res := response.GetResponse(getArguments(w, r))
+	res := response.GetResponse(getArguments(c))
 
-	if err := r.ParseForm(); err != nil {
-		log.Print(err)
-		res.Error(code.UNKNOWN_ERROR, "ParseForm Failure")
-		return
-	}
-
-	name := r.PostFormValue("name")
-	email := r.PostFormValue("email")
-	password := r.PostFormValue("password")
+	name := c.PostForm("name")
+	email := c.PostForm("email")
+	password := c.PostForm("password")
 	if name == "" || email == "" || password == "" {
 		res.Error(code.INPUT_FAIURE, "mismatch input argument")
 		return
 	}
 
-	ctx, cancel := context.WithTimeout(r.Context(), config.SQL_TIMEOUT)
+	ctx, cancel := context.WithTimeout(c.Request.Context(), config.SQL_TIMEOUT)
 	defer cancel()
 
 	userID, err := ExecSignin(db.GetDB(config.SQL_DATABASE), ctx, name, email, password)
@@ -120,30 +117,24 @@ func handleSignin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	session := SessionMgr.SessionStart(w, r)
+	session := SessionMgr.SessionStart(c.Writer, c.Request)
 	session.Set(userID)
 
 	res.Message()
 }
 
-func handleLogin(w http.ResponseWriter, r *http.Request) {
+func handleLogin(c *gin.Context) {
 
-	res := response.GetResponse(getArguments(w, r))
+	res := response.GetResponse(getArguments(c))
 
-	if err := r.ParseForm(); err != nil {
-		log.Print(err)
-		res.Error(code.UNKNOWN_ERROR, "ParseForm Failure")
-		return
-	}
-
-	email := r.PostFormValue("email")
-	password := r.PostFormValue("password")
+	email := c.PostForm("email")
+	password := c.PostForm("password")
 	if email == "" || password == "" {
 		res.Error(code.INPUT_FAIURE, "mismatch input argument")
 		return
 	}
 
-	ctx, cancel := context.WithTimeout(r.Context(), config.SQL_TIMEOUT)
+	ctx, cancel := context.WithTimeout(c.Request.Context(), config.SQL_TIMEOUT)
 	defer cancel()
 
 	userID, err := QueryLogin(db.GetDB(config.SQL_DATABASE), ctx, email, password)
@@ -156,17 +147,17 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 		log.Printf("UpdateLoginTime Failure : %s", err.Error())
 	}
 
-	session := SessionMgr.SessionStart(w, r)
+	session := SessionMgr.SessionStart(c.Writer, c.Request)
 	session.Set(userID)
 
 	res.Message()
 }
 
-func handleSession(w http.ResponseWriter, r *http.Request) {
+func handleSession(c *gin.Context) {
 
-	res := response.GetResponse(getArguments(w, r))
+	res := response.GetResponse(getArguments(c))
 
-	session, err := SessionMgr.SessionRead(w, r)
+	session, err := SessionMgr.SessionRead(c.Writer, c.Request)
 	if err != nil {
 		res.Error(code.SESSION_FAIURE, err.Error())
 		return
@@ -174,31 +165,4 @@ func handleSession(w http.ResponseWriter, r *http.Request) {
 
 	res.Add("value", session.Get())
 	res.Message()
-}
-
-func handleForm(w http.ResponseWriter, r *http.Request) {
-
-	// x-www-form-urlencoded
-	/*
-		if err := r.ParseForm(); err != nil {
-			log.Print(err)
-		}
-	*/
-
-	// form-data
-	if err := r.ParseMultipartForm(1024); err != nil {
-		log.Print(err)
-	}
-
-	log.Print("Form: ", r.Form)
-	log.Print("PostForm: ", r.PostForm)
-	log.Print("FormValue: ", r.FormValue("name"))
-	log.Print("PostFormValue: ", r.PostFormValue("name"))
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	_, err := io.WriteString(w, "Test Form")
-	if err != nil {
-		log.Print("err")
-	}
 }
