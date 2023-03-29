@@ -22,6 +22,8 @@ services:
         #環境變數
         environment:
             API_PORT: :1234
+            SSL_CERTIFICATION: ./ssl/server.pem
+            SSL_PRIVATE_KEY: ./ssl/server.key 
             SQL_DRIVER: mysql
             SQL_USERNAME: root
             SQL_PASSWORD: 1111

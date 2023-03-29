@@ -29,7 +29,7 @@ func apiService() {
 
 	initSession()
 
-	initService()
+	initSSLService()
 }
 
 func initSession() {
@@ -60,6 +60,24 @@ func initService() {
 		log.Print("HTTP server failed to run")
 	} else {
 		log.Printf("HTTP server is running on port %s", config.API_PORT)
+	}
+}
+
+func initSSLService() {
+	engine := gin.Default()
+
+	engine.GET("/", handleRoot)
+	engine.GET("/Debug", handleDebug)
+
+	engine.POST("/Query", handleQuery)
+	engine.POST("/Signin", handleSignin)
+	engine.POST("/Login", handleLogin)
+	engine.POST("/Session", handleSession)
+
+	if err := engine.RunTLS(config.API_PORT, config.SSL_CERTIFICATION, config.SSL_PRIVATE_KEY); err != nil {
+		log.Print("HTTP server failed to run")
+	} else {
+		log.Printf("HTTP server is running on port %s, msg = %s", config.API_PORT, err)
 	}
 }
 

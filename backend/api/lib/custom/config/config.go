@@ -7,7 +7,9 @@ import (
 )
 
 var (
-	API_PORT string
+	API_PORT          string
+	SSL_CERTIFICATION string
+	SSL_PRIVATE_KEY   string
 
 	SQL_DRIVER         string
 	SQL_USERNAME       string
@@ -32,6 +34,8 @@ var (
 
 func init() {
 	API_PORT = os.Getenv("API_PORT")
+	SSL_CERTIFICATION = os.Getenv("SSL_CERTIFICATION")
+	SSL_PRIVATE_KEY = os.Getenv("SSL_PRIVATE_KEY")
 
 	SQL_DRIVER = os.Getenv("SQL_DRIVER")
 	SQL_USERNAME = os.Getenv("SQL_USERNAME")
