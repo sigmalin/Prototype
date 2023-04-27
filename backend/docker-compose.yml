@@ -38,6 +38,8 @@ services:
             REDIS_PORT: 6379
             SESSION_NAME: SIGMA_SESSION_KEY
             SESSION_EXPIRATION: 300
+        volumes:
+            - ./api/ssl:/ssl
     #定義啟動的DB名稱
     go_db:
         #image 來源

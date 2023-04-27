@@ -32,8 +32,8 @@ EXPOSE 1234
 #將編譯結果搬移到執行的指定位置
 COPY --from=builder /src/app /
 
-#將 ssl 相關檔案複製到指定位置
-COPY ssl/ /ssl
+#產生 ssl 資料夾供金鑰存放
+RUN mkdir -p /ssl
 
 #檔案的執行權限 +x = 任何人都可以執行
 CMD chmod +x /app
