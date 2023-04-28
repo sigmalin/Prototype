@@ -10,7 +10,7 @@ services:
             context: ./api
             dockerfile: ./Dockerfile
         #輸出影像檔案名稱
-        image: service/gosql
+        image: service/api_server
         container_name: GoAPI
         #等待指定container完成啟動 在運行
         depends_on:
@@ -39,7 +39,7 @@ services:
             SESSION_NAME: SIGMA_SESSION_KEY
             SESSION_EXPIRATION: 300
         volumes:
-            - ./api/ssl:/ssl
+            - ./ssl:/ssl
     #定義啟動的DB名稱
     go_db:
         #image 來源
@@ -48,7 +48,7 @@ services:
         ports:
             - 37002:3306
         volumes:
-            - ./data:/var/lib/mysql
+            - ./sql/data:/var/lib/mysql
         environment:
             MYSQL_ROOT_PASSWORD: 1111            
     #定義啟動的Redis
@@ -57,3 +57,21 @@ services:
         container_name: GoRedis
         ports:
             - 37003:6379
+    #定義啟動的File Server
+    go_file:
+        # 編譯檔來源
+        build:
+            context: ./file
+            dockerfile: ./Dockerfile
+        image: service/file_server
+        container_name: GoFile
+        ports:
+            - 5678:5678
+        #環境變數
+        environment:
+            FILE_PORT: :5678
+            SSL_CERTIFICATION: ./ssl/server.pem
+            SSL_PRIVATE_KEY: ./ssl/server.key 
+        volumes:
+            - ./ssl:/ssl
+            - ./bundles:/bundles

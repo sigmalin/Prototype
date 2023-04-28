@@ -2,24 +2,26 @@
 
 ## 介紹
 
-- 基本 API Server 
+- 後端架構
 
 ## API
 
-| API | 功能 |
-|:--|:--|
-|/Debug|資料庫逾時存取模擬，必定回傳失敗|
-|/Query|查詢指定使用者資料|
-|/Signin|創建使用者帳號|
-|/Login|使用者登入|
-|/Session|Session 測試|
-|/Form|參數傳遞範本|
+- API Server，提供 Login 、 DB Access 等服務
 
+## File
 
-## 資料夾
+- File Sever，提供 AssetBundle (Addressable) 資源存放
 
-| 名稱 | 內容 |
-|:--|:--|
-|src|golang 程式源碼|
-|sql|db schema|
+## SQL
+
+* 提供 SQL schema 和相關資料存放
+
+## SQL
+
+* 提供 SSL 相關資料存放
+
+---
+
+## 常見問題
+
     
