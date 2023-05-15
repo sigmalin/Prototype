@@ -8,9 +8,7 @@ import (
 )
 
 var (
-	FILE_PORT         string
-	SSL_CERTIFICATION string
-	SSL_PRIVATE_KEY   string
+	FILE_PORT string
 )
 
 // Main will set up an http server and three endpoints
@@ -22,7 +20,7 @@ func main() {
 
 	router.Static("/bundles", "./bundles")
 
-	if err := router.RunTLS(FILE_PORT, SSL_CERTIFICATION, SSL_PRIVATE_KEY); err != nil {
+	if err := router.Run(FILE_PORT); err != nil {
 		log.Print("HTTP server failed to run")
 	} else {
 		log.Printf("HTTP server is running on port %s, msg = %s", FILE_PORT, err)
@@ -31,6 +29,4 @@ func main() {
 
 func initEnv() {
 	FILE_PORT = os.Getenv("FILE_PORT")
-	SSL_CERTIFICATION = os.Getenv("SSL_CERTIFICATION")
-	SSL_PRIVATE_KEY = os.Getenv("SSL_PRIVATE_KEY")
 }

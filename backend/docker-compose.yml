@@ -70,8 +70,5 @@ services:
         #環境變數
         environment:
             FILE_PORT: :5678
-            SSL_CERTIFICATION: ./ssl/server.pem
-            SSL_PRIVATE_KEY: ./ssl/server.key 
         volumes:
-            - ./ssl:/ssl
             - ./bundles:/bundles
