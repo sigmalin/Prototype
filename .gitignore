@@ -1,3 +1,16 @@
 backend/bundles/*
 backend/sql/*
 backend/ssl/*
+
+frontend/.vsconfig
+frontend/*/*.meta
+frontend/*/*/*.meta
+
+frontend/*.csproj
+frontend/*.sln
+
+frontend/Library/*
+frontend/Logs/*
+
+frontend/Temp/*
+frontend/UserSettings/*
