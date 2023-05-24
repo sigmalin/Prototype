@@ -24,7 +24,7 @@
 
     ```
     // 取得資源載入工具
-    var assetLoader = AssetLoaderSingletonFactory.getAssetLoader(AssetLoaderType.Addressable);
+    var assetLoader = AssetLoaderSingletonFactory.GetAssetLoader(AssetLoaderType.Addressable);
     
     // 檢查檔案更新
     assetLoader.UpdateVersion(onDownLoadProcess, onDownLoadCompleted, onDownLoadFailure);`

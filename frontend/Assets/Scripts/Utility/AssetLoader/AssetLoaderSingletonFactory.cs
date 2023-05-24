@@ -10,7 +10,7 @@ namespace AssetLoader
     {
         static Dictionary<AssetLoaderType, IAssetLoader> table = new Dictionary<AssetLoaderType, IAssetLoader>();
 
-        static public IAssetLoader getAssetLoader(AssetLoaderType key)
+        static public IAssetLoader GetAssetLoader(AssetLoaderType key)
         {
             IAssetLoader loader = null;
             if (table.TryGetValue(key, out loader)) return loader;
