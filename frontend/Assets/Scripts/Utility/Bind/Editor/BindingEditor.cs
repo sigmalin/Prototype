@@ -37,7 +37,7 @@ namespace Bind.Editor
             serializedObject.Update();
 
             list.DoLayoutList();
-
+            
             serializedObject.ApplyModifiedProperties();
         }
 
@@ -53,24 +53,22 @@ namespace Bind.Editor
             SerializedProperty element = list.serializedProperty.GetArrayElementAtIndex(index);
 
             EditorGUI.LabelField(new Rect(rect.x, rect.y, 60, EditorGUIUtility.singleLineHeight), "Identifier");
-
-            var component = new SerializedObject(element.objectReferenceValue);
-
+                        
             EditorGUI.PropertyField(
                 new Rect(rect.x + 60, rect.y, 100, EditorGUIUtility.singleLineHeight),
-                component.FindProperty("identifier").FindPropertyRelative("identifer"),
+                element.FindPropertyRelative("identifier").FindPropertyRelative("identifier"),
                 GUIContent.none
                 );
 
-            component.ApplyModifiedProperties();
+            element.FindPropertyRelative("identifier").serializedObject.ApplyModifiedProperties();
 
-            var type = (element.objectReferenceValue as BindComponent).Type;
+            BindType type = (BindType)Enum.GetValues(typeof(BindType)).GetValue(element.FindPropertyRelative("type").enumValueIndex);
 
             EditorGUI.LabelField(new Rect(rect.x + 200, rect.y, 60, EditorGUIUtility.singleLineHeight), $"{type}", getStyle(type));
 
             EditorGUI.PropertyField(
                 new Rect(rect.x + 260, rect.y, 100, EditorGUIUtility.singleLineHeight),
-                element,
+                element.FindPropertyRelative("gameObject"),
                 GUIContent.none
                 );
         }

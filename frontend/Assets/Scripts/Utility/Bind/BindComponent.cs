@@ -10,10 +10,13 @@ namespace Bind
         public virtual BindType Type { get; }
 
         public virtual Identifier ID { get; }
+
+        public virtual List<BindData> Binds { get; }
     }
 
     public enum BindType
     {
+        None,
         Element,
         Node,
         Container,

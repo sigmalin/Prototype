@@ -11,6 +11,8 @@ namespace Bind
 
         public override Identifier ID => identifier;
 
+        public override List<BindData> Binds => null;
+
         [SerializeField]
         Identifier identifier = new Identifier();
     }

@@ -24,6 +24,8 @@ namespace Bind.Editor
             {
                 (target as BindContainer).Initialize();
 
+                EditorUtility.SetDirty(target);
+
                 EditorUtility.DisplayDialog("Re-bind", "Re-bind All Componet Completed", "OK");
             }
 

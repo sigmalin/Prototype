@@ -6,7 +6,7 @@ namespace AssetLoader
     {        
         void UpdateVersion(Action<IDownloadStatus> onProcess, Action onCompleted, Action<Exception> onFailured);
         
-        IDisposable Load(string key, Action<Object> callback);
+        IDisposable Load<T>(string key, Action<Object> callback);
         
         void Release(string key);
     }

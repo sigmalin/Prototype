@@ -92,7 +92,7 @@ namespace AssetLoader
             onCompleted?.Invoke();
         }
 
-        public IDisposable Load(string key, Action<object> callback)
+        public IDisposable Load<T>(string key, Action<object> callback)
         {
             AsyncOperationHandle handle;
             if (resTable.TryGetValue(key, out handle))
@@ -105,7 +105,7 @@ namespace AssetLoader
             }
             else
             {
-                handle = Addressables.LoadAssetAsync<GameObject>(key);
+                handle = Addressables.LoadAssetAsync<T>(key);
                 resTable.Add(key, handle);
             }
 

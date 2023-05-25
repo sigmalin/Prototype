@@ -10,8 +10,11 @@ namespace Bind
 
         public override Identifier ID => null;
 
-        [SerializeField][HideInInspector]
-        List<BindComponent> bindings = new List<BindComponent>();
+        public override List<BindData> Binds => bindings;
+
+        [HideInInspector]
+        [SerializeField]        
+        List<BindData> bindings = new List<BindData>();
 
         public void Initialize()
         {
@@ -47,13 +50,13 @@ namespace Bind
         public bool AddBindComponent(BindComponent component)
         {
             if (component == null) return false;
-            if (component.Type == BindType.Container) return false;
+            if (component.Type == BindType.Container || component.Type == BindType.None) return false;
 
-            bindings.Add(component);
+            bindings.Add(new BindData(component));
             return true;
         }
 
-        public List<BindComponent> GetBindings()
+        public List<BindData> GetBindings()
         {
             return bindings;
         }

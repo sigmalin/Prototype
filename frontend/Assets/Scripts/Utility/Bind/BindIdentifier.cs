@@ -9,9 +9,9 @@ namespace Bind
     public class Identifier
     {
         [SerializeField]
-        string identifer = string.Empty;
+        string identifier = string.Empty;
 
-        public string Value => identifer;
+        public string Value => identifier;
     }
 }
 
