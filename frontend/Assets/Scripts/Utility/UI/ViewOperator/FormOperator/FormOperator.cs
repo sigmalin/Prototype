@@ -4,13 +4,13 @@ using UnityEngine;
 
 namespace UI
 {
-    class FormLayer : IViewOperator
+    class FormOperator : IViewOperator
     {
         RectTransform root;
 
         Stack<IView> stack;
 
-        public FormLayer(RectTransform canvas, int capacity = 16)
+        public FormOperator(RectTransform canvas, int capacity = 16)
         {
             root = canvas;
             stack = new Stack<IView>(capacity);
@@ -52,7 +52,7 @@ namespace UI
         public void SetParent(IView view)
         {
             if (view == null) return;
-
+            
             if (view.root != null)
             {
                 view.root.SetParent(root);

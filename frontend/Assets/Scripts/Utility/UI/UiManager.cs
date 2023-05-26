@@ -45,16 +45,18 @@ namespace UI
 
             if (assetLoader != null)
             {
-                IViewLoader viewLoader = presenter;
-                viewLoader.Disposable = assetLoader.Load<GameObject>(
+                presenter.AddDisposable (assetLoader.Load<GameObject>(
                     presenter.ViewPath, 
                     (raw) => {
-                        GameObject view = GameObject.Instantiate<GameObject>(raw as GameObject);
+                        GameObject view = GameObject.Instantiate<GameObject>(raw as GameObject);                        
+
                         presenter.Binding(view);
-                        viewLoader.onFinishHandle();
 
                         viewManager?.SetParent(presenter);
-                    });
+
+                        IViewLoader viewLoader = presenter;
+                        viewLoader.finish();
+                    }));
             }
 
             return presenter;

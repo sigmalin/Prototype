@@ -4,8 +4,6 @@ namespace UI
 {
     internal interface IViewLoader
     {
-        IDisposable Disposable { set; }
-
-        void onFinishHandle();
+        void finish();
     }
 }

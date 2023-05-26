@@ -1,6 +1,7 @@
 using UnityEngine;
 using UI;
 using System;
+using System.Collections.Generic;
 
 namespace Bind.Presenter
 {
@@ -12,21 +13,30 @@ namespace Bind.Presenter
 
         RectTransform IView.root => (RectTransform)(target?.transform);
 
-        IDisposable IViewLoader.Disposable { set => viewDisposable = value; }
-
-        IDisposable viewDisposable;
+        List<IDisposable> disposables;
 
         ViewState state;
 
         public UiPresenter() : base()
         {
             state = ViewState.None;
+
+            disposables = new List<IDisposable>();
+        }
+
+        void clearDisposables()
+        {
+            for (int i = 0; i < disposables.Count; ++i)
+            {
+                disposables[i].Dispose();
+            }
+
+            disposables.Clear();
         }
 
         protected override void release()
         {
-            viewDisposable?.Dispose();
-            viewDisposable = null;
+            clearDisposables();
 
             base.release();
         }
@@ -34,6 +44,13 @@ namespace Bind.Presenter
         protected virtual void onOpenHandle()
         {
             target?.SetActive(true);
+        }
+
+        public void AddDisposable(IDisposable disposable)
+        {
+            if (disposable == null) return;
+
+            disposables.Add(disposable);
         }
 
         protected virtual void onHideHandle()
@@ -76,7 +93,7 @@ namespace Bind.Presenter
             }
         }
 
-        void IViewLoader.onFinishHandle()
+        void IViewLoader.finish()
         {
             switch (state)
             {

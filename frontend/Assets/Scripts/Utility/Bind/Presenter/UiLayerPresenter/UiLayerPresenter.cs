@@ -32,7 +32,7 @@ namespace Bind.Presenter
                 var data = getBindData(enumNames[i]);
                 if (data != null)
                 {
-                    layers.Add(enumValues[i], new FormLayer((RectTransform)data.Target.transform));
+                    layers.Add(enumValues[i], new FormOperator((RectTransform)data.Target.transform));
                 }
             }
         }
@@ -44,7 +44,7 @@ namespace Bind.Presenter
 
         void IViewManager.SetParent(IView view)
         {
-            IViewOperator viewOperator = getViewLayer(view.Layer);
+            IViewOperator viewOperator = getViewLayer(view.Layer);            
             if (viewOperator != null) viewOperator.SetParent(view);
         }
 
