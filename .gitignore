@@ -1,5 +1,5 @@
 backend/bundles/*
-backend/sql/*
+backend/sql/data/*
 backend/ssl/*
 
 frontend/.vsconfig
@@ -14,3 +14,4 @@ frontend/Logs/*
 
 frontend/Temp/*
 frontend/UserSettings/*
+frontend/obj/*
