@@ -12,9 +12,9 @@ namespace AssetLoader
     {
         Dictionary<string, AsyncOperationHandle> resTable;
 
-        public AddressableLoader(int capacity = 128)
+        public AddressableLoader()
         {
-            resTable = new Dictionary<string, AsyncOperationHandle>(capacity);
+            resTable = new Dictionary<string, AsyncOperationHandle>(128);
         }
 
         async public void UpdateVersion(Action<IDownloadStatus> onProcess, Action onCompleted, Action<Exception> onFailured)

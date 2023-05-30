@@ -24,7 +24,7 @@
 
     ```
     // 取得資源載入工具
-    var assetLoader = AssetLoaderSingletonFactory.GetAssetLoader(AssetLoaderType.Addressable);
+    IAssetLoader assetLoader = Singleton<AddressableLoader>.Instance;
     
     // 檢查檔案更新
     assetLoader.UpdateVersion(onDownLoadProcess, onDownLoadCompleted, onDownLoadFailure);`
@@ -48,7 +48,7 @@
     ```
     // 檔案載入呼叫
     var disposable = assetLoader.Load(AddressNameStr, (raw) => {
-            disposable = null;
+            // TODO
         });
     ```
 

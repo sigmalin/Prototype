@@ -4,13 +4,13 @@ using UnityEngine;
 
 namespace UI
 {
-    class FormOperator : IViewOperator
+    class NormalOperator : IViewOperator
     {
         RectTransform root;
 
         Stack<IView> stack;
 
-        public FormOperator(RectTransform canvas, int capacity = 16)
+        public NormalOperator(RectTransform canvas, int capacity = 16)
         {
             root = canvas;
             stack = new Stack<IView>(capacity);

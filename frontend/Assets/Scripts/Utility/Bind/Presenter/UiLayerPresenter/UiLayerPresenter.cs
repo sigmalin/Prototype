@@ -32,7 +32,7 @@ namespace Bind.Presenter
                 var data = getBindData(enumNames[i]);
                 if (data != null)
                 {
-                    layers.Add(enumValues[i], new FormOperator((RectTransform)data.Target.transform));
+                    layers.Add(enumValues[i], new NormalOperator((RectTransform)data.Target.transform));
                 }
             }
         }

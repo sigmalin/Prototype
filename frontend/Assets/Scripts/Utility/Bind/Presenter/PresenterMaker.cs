@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Bind.Presenter
 {
-    public class PresenterFactory
+    public class PresenterMaker
     {
         static public T Binding<T>(GameObject go) where T : IPresnter, new()
         {

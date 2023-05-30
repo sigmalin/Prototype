@@ -31,7 +31,7 @@ namespace UI
 
         public void InjectViewLayers(GameObject viewLayers)
         {
-            viewManager = PresenterFactory.Binding<UiLayerPresenter>(viewLayers);
+            viewManager = PresenterMaker.Binding<UiLayerPresenter>(viewLayers);
         }
 
         string getPresenterKey(Type type)
