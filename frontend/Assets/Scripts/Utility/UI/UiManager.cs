@@ -50,12 +50,19 @@ namespace UI
                     (raw) => {
                         GameObject view = GameObject.Instantiate<GameObject>(raw as GameObject);                        
 
-                        presenter.Binding(view);
+                        if (presenter.Binding(view) == true)
+                        {
+                            viewManager?.SetParent(presenter);
 
-                        viewManager?.SetParent(presenter);
+                            IViewLoader viewLoader = presenter;
+                            viewLoader.finish();
 
-                        IViewLoader viewLoader = presenter;
-                        viewLoader.finish();
+                            openView<T>(presenter);
+                        }
+                        else
+                        {
+                            Close<T>();
+                        }
                     }));
             }
 
@@ -76,12 +83,7 @@ namespace UI
                 table.Add(key, presenter);
             }
 
-            if (viewManager.Open(presenter) == false)
-            {
-                Close<T>();
-            }
-
-            return (presenter as T);
+            return (openView<T>(presenter) as T);
         }
 
         public void Close<T>() where T : UiPresenter, new()
@@ -95,7 +97,7 @@ namespace UI
 
             table.Remove(key);
 
-            viewManager.Close(presenter);
+            closeView(presenter);
         }
 
         public void ClearLayer(ViewLayer layer)
@@ -103,6 +105,22 @@ namespace UI
             viewManager?.Clear(layer);
         }
 
+        UiPresenter openView<T>(UiPresenter presenter) where T : UiPresenter, new()
+        {
+            if (viewManager.Open(presenter) == false)
+            {
+                Close<T>();
+
+                presenter = null;
+            }
+
+            return presenter;
+        }
+
+        void closeView(UiPresenter presenter)
+        {
+            viewManager.Close(presenter);
+        }
     }
 }
 

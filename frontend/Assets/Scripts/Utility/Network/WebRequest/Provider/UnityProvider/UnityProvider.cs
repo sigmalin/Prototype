@@ -13,19 +13,15 @@ namespace Network.WebRequest.Provider
     {
         int retryTimeOut;
 
-        SkipCertificate skipCertificate;
-
         public UnityProvider(UnityProviderOrder order)
         {
             retryTimeOut = order.RetryTimeOut;
-
-            skipCertificate = new SkipCertificate();
         }
 
         public async Task<Tuple<Result, string>> Get(string api)
         {
             UnityWebRequest request = UnityWebRequest.Get(api);
-            request.certificateHandler = skipCertificate;
+            request.certificateHandler = new SkipCertificate();
 
             request.timeout = retryTimeOut;
 
@@ -45,7 +41,7 @@ namespace Network.WebRequest.Provider
             }
 
             UnityWebRequest request = UnityWebRequest.Post(api, form);
-            request.certificateHandler = skipCertificate;
+            request.certificateHandler = new SkipCertificate();
 
             request.timeout = retryTimeOut;
 

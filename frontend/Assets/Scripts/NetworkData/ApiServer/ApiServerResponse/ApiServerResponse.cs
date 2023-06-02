@@ -7,7 +7,7 @@ namespace NetworkData.ApiServer
     public class ApiServerResponse : ServerResponse
     {
         public Error error;
-        public ApiServerResponse() : base(Result.Success)
+        public ApiServerResponse(Result result) : base(result)
         {
         }
     }
@@ -15,7 +15,7 @@ namespace NetworkData.ApiServer
     [Serializable]
     public class Error
     {
-        public decimal code;
+        public int code;
         public string message;
     }
 }

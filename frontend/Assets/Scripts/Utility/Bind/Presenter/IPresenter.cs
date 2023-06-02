@@ -6,6 +6,6 @@ namespace Bind.Presenter
 {
     public interface IPresnter
     {
-        void Binding(GameObject go);
+        bool Binding(GameObject go);
     }
 }

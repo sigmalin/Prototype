@@ -10,7 +10,10 @@ namespace Bind.Presenter
         {
             T presenter = new T();
 
-            presenter.Binding(go);
+            if (presenter.Binding(go) == false)
+            {
+                presenter = default(T);
+            }
 
             return presenter;
         }

@@ -15,7 +15,8 @@ namespace UI
 
     public enum ViewState
     {
-        None,
+        WaitBinding,
+        BingCompleted,
         Open,
         Hide,
         Close,
@@ -25,6 +26,7 @@ namespace UI
     {
         ViewLayer Layer { get; }
         RectTransform root { get; }
+        ViewState state { get; }
         void open();
         void hide();
         void close();

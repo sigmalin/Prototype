@@ -41,7 +41,7 @@ namespace Network.WebRequest.Protocol
         {
             if (response.Item1 != Result.Success)
             {
-                return (T)new ServerResponse(response.Item1);
+                return (T)Activator.CreateInstance(typeof(T), response.Item1);
             }
 
             return parseContent<T>(response.Item2);
@@ -49,7 +49,6 @@ namespace Network.WebRequest.Protocol
 
         T parseContent<T>(string json) where T : ServerResponse
         {
-            Debug.Log($"json = {json}");
             return JsonUtility.FromJson<T>(json);
         }
     }

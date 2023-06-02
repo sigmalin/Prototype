@@ -61,8 +61,10 @@ namespace Bind.Presenter
             return data.Target?.GetComponent<T>();
         }
 
-        public void Binding(GameObject go)
+        public bool Binding(GameObject go)
         {
+            bool isSuccess = true;
+
             target = go;
 
             BindComponent componenet = go?.GetComponent<BindComponent>();
@@ -75,7 +77,11 @@ namespace Bind.Presenter
             catch(System.Exception ex)
             {
                 Debug.LogError(ex);
-            }            
+
+                isSuccess = false;
+            }
+
+            return isSuccess;
         }
 
         protected virtual void onBindingCompleted()

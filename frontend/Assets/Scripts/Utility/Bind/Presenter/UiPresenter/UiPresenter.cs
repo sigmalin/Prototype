@@ -11,15 +11,17 @@ namespace Bind.Presenter
 
         public virtual ViewLayer Layer { get; }
 
+        public ViewState state => viewState;
+
         RectTransform IView.root => (RectTransform)(target?.transform);
 
         List<IDisposable> disposables;
 
-        ViewState state;
+        ViewState viewState;
 
         public UiPresenter() : base()
         {
-            state = ViewState.None;
+            viewState = ViewState.WaitBinding;
 
             disposables = new List<IDisposable>();
         }
@@ -41,16 +43,16 @@ namespace Bind.Presenter
             base.release();
         }
 
-        protected virtual void onOpenHandle()
-        {
-            target?.SetActive(true);
-        }
-
         public void AddDisposable(IDisposable disposable)
         {
             if (disposable == null) return;
 
             disposables.Add(disposable);
+        }
+
+        protected virtual void onOpenHandle()
+        {
+            target?.SetActive(true);
         }
 
         protected virtual void onHideHandle()
@@ -65,7 +67,7 @@ namespace Bind.Presenter
 
         void IView.open()
         {
-            state = ViewState.Open;
+            viewState = ViewState.Open;
 
             if (target != null)
             {
@@ -75,7 +77,7 @@ namespace Bind.Presenter
 
         void IView.hide()
         {
-            state = ViewState.Hide;
+            viewState = ViewState.Hide;
 
             if (target != null)
             {
@@ -85,7 +87,7 @@ namespace Bind.Presenter
 
         void IView.close()
         {
-            state = ViewState.Close;
+            viewState = ViewState.Close;
 
             if (target != null)
             {
@@ -95,20 +97,7 @@ namespace Bind.Presenter
 
         void IViewLoader.finish()
         {
-            switch (state)
-            {
-                case ViewState.Open:
-                    onOpenHandle();
-                    break;
-
-                case ViewState.Hide:
-                    onHideHandle();
-                    break;
-
-                case ViewState.Close:
-                    onCloseHandle();
-                    break;
-            }
+            viewState = ViewState.BingCompleted;
         }
     }
 }

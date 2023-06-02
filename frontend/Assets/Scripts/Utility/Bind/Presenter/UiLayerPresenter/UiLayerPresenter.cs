@@ -50,6 +50,8 @@ namespace Bind.Presenter
 
         bool IViewManager.Open(IView view)
         {
+            if (view.state == ViewState.WaitBinding) return true;
+            
             IViewOperator viewOperator = getViewLayer(view.Layer);
             viewOperator?.Open(view);
 
