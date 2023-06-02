@@ -22,7 +22,7 @@
 
     - example :
 
-    ```
+    ```cs
     // 取得資源載入工具
     IAssetLoader assetLoader = Singleton<AddressableLoader>.Instance;
     
@@ -45,7 +45,7 @@
     }
     ```
 
-    ```
+    ```cs
     // 檔案載入呼叫
     var disposable = assetLoader.Load(AddressNameStr, (raw) => {
             // TODO

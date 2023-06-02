@@ -28,7 +28,7 @@
 
 - 操作方法 :
 
-    ```
+    ```cs
     // 首先，宣告一個繼承 Presenter 的 class
     class TutorialPresenter : Presenter
     {
@@ -53,7 +53,7 @@
     }
     ```
 
-    ```    
+    ```cs
     void onLoadCompleted(GameObject go)
     {
         // 在資源載入完成後，透過呼叫 PresenterMaker.Binding<T>，將 Presenter 和目標資源 bind

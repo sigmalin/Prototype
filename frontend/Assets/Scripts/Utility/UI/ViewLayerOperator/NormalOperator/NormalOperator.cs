@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace UI
 {
-    class NormalOperator : IViewOperator
+    class NormalOperator : IViewLayerOperator
     {
         RectTransform root;
 

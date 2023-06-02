@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace UI
 {
-    interface IViewOperator
+    interface IViewLayerOperator
     {
         void SetParent(IView view);
         void Open(IView view);

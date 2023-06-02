@@ -9,18 +9,18 @@ namespace Bind.Presenter
 {
     public class UiLayerPresenter : Presenter, IViewManager
     {
-        Dictionary<ViewLayer, IViewOperator> layers;
+        Dictionary<ViewLayer, IViewLayerOperator> layers;
 
         public UiLayerPresenter() : base()
         {
-            layers = new Dictionary<ViewLayer, IViewOperator>();
+            layers = new Dictionary<ViewLayer, IViewLayerOperator>();
         }
 
-        IViewOperator getViewLayer(ViewLayer layer)
+        IViewLayerOperator getViewLayerOperator(ViewLayer layer)
         {
-            IViewOperator viewOperator = null;
-            layers.TryGetValue(layer, out viewOperator);
-            return viewOperator;
+            IViewLayerOperator viewLayerOperator = null;
+            layers.TryGetValue(layer, out viewLayerOperator);
+            return viewLayerOperator;
         }
 
         void parseLayer()
@@ -44,30 +44,30 @@ namespace Bind.Presenter
 
         void IViewManager.SetParent(IView view)
         {
-            IViewOperator viewOperator = getViewLayer(view.Layer);            
-            if (viewOperator != null) viewOperator.SetParent(view);
+            IViewLayerOperator viewLayerOperator = getViewLayerOperator(view.Layer);            
+            if (viewLayerOperator != null) viewLayerOperator.SetParent(view);
         }
 
         bool IViewManager.Open(IView view)
         {
             if (view.state == ViewState.WaitBinding) return true;
             
-            IViewOperator viewOperator = getViewLayer(view.Layer);
-            viewOperator?.Open(view);
+            IViewLayerOperator viewLayerOperator = getViewLayerOperator(view.Layer);
+            viewLayerOperator?.Open(view);
 
-            return viewOperator != null;
+            return viewLayerOperator != null;
         }
 
         void IViewManager.Close(IView view)
         {
-            IViewOperator viewOperator = getViewLayer(view.Layer);
-            viewOperator?.Close(view);
+            IViewLayerOperator viewLayerOperator = getViewLayerOperator(view.Layer);
+            viewLayerOperator?.Close(view);
         }
 
         void IViewManager.Clear(ViewLayer layer)
         {
-            IViewOperator viewOperator = getViewLayer(layer);
-            viewOperator?.Clear();
+            IViewLayerOperator viewLayerOperator = getViewLayerOperator(layer);
+            viewLayerOperator?.Clear();
         }
     }
 }
