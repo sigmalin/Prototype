@@ -1,0 +1,26 @@
+go 1.20
+
+use (
+	./api
+	./api/test
+	./api/test/helloworld
+	./api/test/query
+	./api/test/query/all-users
+	./api/test/query/session-content
+	./api/users
+	./api/users/login
+	./api/users/signin
+	./cmd
+	./configs
+	./init
+	./internal/connect/db
+	./internal/connect/redis
+	./internal/response/code
+	./internal/response/custom
+	./internal/response/gin
+	./internal/session-provider/redis
+	./internal/uid/satori
+	./pkg/response
+	./pkg/session
+	./pkg/uid
+)

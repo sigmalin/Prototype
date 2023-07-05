@@ -9,17 +9,11 @@ LABEL stage=gobuilder
 #Dockerfile 作者
 MAINTAINER Sigma
 
-#設定 GOROOT 位置(環境預設值)
-ENV GOROOT=/usr/local/go
-
-#複製 golang 自訂 package 到 $GOROOT/src 下
-COPY lib/         ${GOROOT}/src
-
-#複製 golang 檔案 到 Container 內的指定目錄 (包含 go.mod(必要), go.sum(根據專案產生))
-COPY src/         /src
+#複製 golang 檔案 到 Container 內的指定目錄
+COPY ./         /src
 
 #執行編譯 並設定編譯參數減少輸出檔案容量 將輸出結果命名為 app
-RUN cd /src && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o app 
+RUN cd /src && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o app main
 
 
 
