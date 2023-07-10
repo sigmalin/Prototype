@@ -6,7 +6,7 @@ import (
 )
 
 type content struct {
-	Message string `json:"message"`
+	Message string `json:"message" example:"hello world"`
 }
 
 func Handle(res *response.Body) {

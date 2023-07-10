@@ -1,8 +1,8 @@
 package response
 
 type Body struct {
-	Code    int         `json:"code"`
-	Message string      `json:"message"`
+	Code    int         `json:"code" example:"0"`
+	Message string      `json:"message" example:""`
 	Data    interface{} `json:"data"`
 }
 

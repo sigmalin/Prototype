@@ -19,7 +19,7 @@ type Arguments struct {
 }
 
 type signInData struct {
-	Token string `json:"token"`
+	Token string `json:"Token" example:"d704e538-4f2f-486d-a2a1-a2b0ad3b4fe7"`
 }
 
 func NewArguments(db *sql.DB, ctx context.Context, session session.Session, token string) *Arguments {

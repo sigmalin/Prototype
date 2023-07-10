@@ -8,12 +8,10 @@ import (
 	"response/code"
 )
 
-type Response = response.Body
-
-type User struct {
-	UserID int    `json:"UserID"`
-	Token  string `json:"Token"`
-	Name   string `json:"Name"`
+type user struct {
+	UserID int    `json:"UserID" example:"7"`
+	Token  string `json:"Token" example:"d704e538-4f2f-486d-a2a1-a2b0ad3b4fe7"`
+	Name   string `json:"Name" example:"sigma"`
 }
 
 func Handle(ctx context.Context, db *sql.DB, res *response.Body) {
@@ -31,9 +29,9 @@ func Handle(ctx context.Context, db *sql.DB, res *response.Body) {
 		return
 	}
 
-	users := []User{}
+	users := []user{}
 	for rows.Next() {
-		u := &User{}
+		u := &user{}
 		if err := rows.Scan(&u.UserID, &u.Token, &u.Name); err != nil {
 			res.Error(code.UNKNOWN_ERROR, err.Error())
 			return

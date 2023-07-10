@@ -33,7 +33,7 @@ func (h *handler) send(c *gin.Context, res *response.Body) {
 // @Tags test
 // @version 1.0
 // @produce application/json
-// @Success 200 {string} string "sigmaYAYA"
+// @Success 200 {object} response.Body{data=helloworld.content} "Success"
 // @Router /test/helloworld [get]
 func (h *handler) helloworld(c *gin.Context) {
 

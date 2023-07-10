@@ -54,6 +54,12 @@ func (h *handler) newSession(c *gin.Context) session.Session {
 	return h.sessionMgr.SessionStart(c.Writer, c.Request)
 }
 
+// @Summary User Signin
+// @Tags users
+// @version 1.0
+// @produce application/json
+// @Success 200 {object} response.Body{data=signin.signInData} "Success"
+// @Router /users/signin [get]
 func (h *handler) signin(c *gin.Context) {
 
 	ctx, cancel := context.WithTimeout(c.Request.Context(), config.SQL_TIMEOUT)
@@ -72,6 +78,13 @@ func (h *handler) signin(c *gin.Context) {
 	h.send(c, res)
 }
 
+// @Summary User Login
+// @Tags users
+// @version 1.0
+// @produce application/json
+// @Param token formData string true "login token"
+// @Success 200 {object} response.Body{data=login.logInData} "Success"
+// @Router /users/login [post]
 func (h *handler) login(c *gin.Context) {
 
 	token := c.PostForm("token")
