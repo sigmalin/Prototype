@@ -19,6 +19,12 @@ func (h *handler) getResponse(c *gin.Context) *rgin.GinResponse {
 	return rgin.NewResponse(c)
 }
 
+// @Summary Recive HelloWorld from server
+// @Tags test
+// @version 1.0
+// @produce application/json
+// @Success 200 {string} string "sigmaYAYA"
+// @Router /test/helloworld [get]
 func (h *handler) helloworld(c *gin.Context) {
 
 	res := h.getResponse(c)

@@ -72,3 +72,26 @@ services:
             FILE_PORT: :5678
         volumes:
             - ./bundles:/bundles
+    #定義啟動的 Swagger-UI
+    swagger_ui:
+        image: swaggerapi/swagger-ui
+        container_name: GoSwaggerUI
+        ports:
+            - 37004:8080
+        volumes:
+            - ./swagger/doc:/usr/share/nginx/html/doc
+        environment:
+            API_URL: doc/swagger.yaml
+    #定義啟動的 nginx
+    nginx:
+        image: nginx:stable-alpine
+        container_name: GoNginx
+        ports:
+            - 80:80
+            - 443:443
+        volumes:
+            - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+            - ./nginx/logs:/var/log/nginx
+            - ./ssl:/etc/nginx/cert
+        depends_on:
+            - swagger_ui
