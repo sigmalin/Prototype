@@ -2,14 +2,15 @@ package query
 
 import (
 	"config"
+	"net/http"
+	"response"
+	"response/code"
 
 	"database/sql"
 
 	"github.com/gin-gonic/gin"
 
 	"connect/db"
-	"response/code"
-	rgin "response/gin"
 	"session"
 
 	"api/test/query/allusers"
@@ -28,8 +29,16 @@ func newHandler() *handler {
 	}
 }
 
-func (h *handler) getResponse(c *gin.Context) *rgin.GinResponse {
-	return rgin.NewResponse(c)
+func (h *handler) newResponse() *response.Body {
+	return &response.Body{Code: code.SUCCESS, Message: ""}
+}
+
+func (h *handler) send(c *gin.Context, res *response.Body) {
+	if res.Code == code.SUCCESS {
+		c.JSON(http.StatusOK, res)
+	} else {
+		c.JSON(http.StatusBadRequest, res)
+	}
 }
 
 func (h *handler) getSession(c *gin.Context) (session.Session, error) {
@@ -38,20 +47,25 @@ func (h *handler) getSession(c *gin.Context) (session.Session, error) {
 
 func (h *handler) sessionContent(c *gin.Context) {
 
-	res := h.getResponse(c)
+	res := h.newResponse()
 
 	ses, err := h.getSession(c)
 	if err != nil {
 		res.Error(code.SESSION_FAIURE, err.Error())
+		h.send(c, res)
 		return
 	}
 
-	content.Handle(res, ses)
+	content.Handle(ses, res)
+
+	h.send(c, res)
 }
 
 func (h *handler) allUsers(c *gin.Context) {
 
-	res := h.getResponse(c)
+	res := h.newResponse()
 
-	allusers.Handle(c.Request.Context(), res, h.mainDB)
+	allusers.Handle(c.Request.Context(), h.mainDB, res)
+
+	h.send(c, res)
 }

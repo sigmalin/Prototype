@@ -15,12 +15,10 @@ use (
 	./init
 	./internal/connect/db
 	./internal/connect/redis
+	./internal/response
 	./internal/response/code
-	./internal/response/custom
-	./internal/response/gin
 	./internal/session-provider/redis
 	./internal/uid/satori
-	./pkg/response
 	./pkg/session
 	./pkg/uid
 )

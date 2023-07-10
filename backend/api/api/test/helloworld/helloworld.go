@@ -2,12 +2,16 @@ package helloworld
 
 import (
 	"response"
+	"response/code"
 )
 
-func Handle(res response.Response) {
-	data := make(map[string]interface{})
-	data["message"] = "hello world"
+type content struct {
+	Message string `json:"message"`
+}
 
-	res.Add("data", data)
-	res.Message()
+func Handle(res *response.Body) {
+
+	res.Code = code.SUCCESS
+	res.Message = ""
+	res.Data = &content{Message: "hello world"}
 }

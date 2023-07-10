@@ -3,13 +3,15 @@ package users
 import (
 	"config"
 	"context"
+	"net/http"
+	"response"
+	"response/code"
 
 	"database/sql"
 
 	"github.com/gin-gonic/gin"
 
 	"connect/db"
-	rgin "response/gin"
 	"session"
 	"uid"
 
@@ -31,13 +33,21 @@ func newHandler() *handler {
 	}
 }
 
+func (h *handler) newResponse() *response.Body {
+	return &response.Body{Code: code.SUCCESS, Message: ""}
+}
+
+func (h *handler) send(c *gin.Context, res *response.Body) {
+	if res.Code == code.SUCCESS {
+		c.JSON(http.StatusOK, res)
+	} else {
+		c.JSON(http.StatusBadRequest, res)
+	}
+}
+
 func (h *handler) newToken() string {
 	uid, _ := h.generator()
 	return uid
-}
-
-func (h *handler) getResponse(c *gin.Context) *rgin.GinResponse {
-	return rgin.NewResponse(c)
 }
 
 func (h *handler) newSession(c *gin.Context) session.Session {
@@ -49,14 +59,17 @@ func (h *handler) signin(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(c.Request.Context(), config.SQL_TIMEOUT)
 	defer cancel()
 
+	res := h.newResponse()
+
 	args := signin.NewArguments(
 		h.mainDB,
 		ctx,
-		h.getResponse(c),
 		h.newSession(c),
 		h.newToken())
 
-	signin.SignIn(args)
+	signin.SignIn(args, res)
+
+	h.send(c, res)
 }
 
 func (h *handler) login(c *gin.Context) {
@@ -66,12 +79,15 @@ func (h *handler) login(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(c.Request.Context(), config.SQL_TIMEOUT)
 	defer cancel()
 
+	res := h.newResponse()
+
 	args := login.NewArguments(
 		h.mainDB,
 		ctx,
-		h.getResponse(c),
 		h.newSession(c),
 		token)
 
-	login.LogIn(args)
+	login.LogIn(args, res)
+
+	h.send(c, res)
 }

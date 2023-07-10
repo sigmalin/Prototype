@@ -8,13 +8,15 @@ import (
 	"response/code"
 )
 
+type Response = response.Body
+
 type User struct {
 	UserID int    `json:"UserID"`
 	Token  string `json:"Token"`
 	Name   string `json:"Name"`
 }
 
-func Handle(ctx context.Context, res response.Response, db *sql.DB) {
+func Handle(ctx context.Context, db *sql.DB, res *response.Body) {
 
 	prepare, err1 := db.PrepareContext(ctx, "SELECT UserID, Token, Name From Users")
 	if err1 != nil {
@@ -45,6 +47,5 @@ func Handle(ctx context.Context, res response.Response, db *sql.DB) {
 		return
 	}
 
-	res.Add("data", users)
-	res.Message()
+	res.Data = users
 }

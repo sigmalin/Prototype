@@ -5,10 +5,11 @@ import (
 	"session"
 )
 
-func Handle(res response.Response, ses session.Session) {
-	data := make(map[string]interface{})
-	data["content"] = ses.Get()
+type content struct {
+	Content string `json:"content"`
+}
 
-	res.Add("data", data)
-	res.Message()
+func Handle(ses session.Session, res *response.Body) {
+
+	res.Data = &content{Content: ses.Get().(string)}
 }
