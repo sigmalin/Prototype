@@ -12,8 +12,8 @@ import (
 // @contact.name sigma
 // @contact.url https://github.com/sigmalin/Prototype
 
-// @host 127.0.0.1:80
-// @schemes http
+// @host 127.0.0.1:443
+// @schemes https
 func main() {
 
 	initial.AllService()

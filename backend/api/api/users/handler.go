@@ -84,6 +84,7 @@ func (h *handler) signin(c *gin.Context) {
 // @produce application/json
 // @Param token formData string true "login token"
 // @Success 200 {object} response.Body{data=login.logInData} "Success"
+// @Failure 400 {object} response.Body "Login Failure"
 // @Router /users/login [post]
 func (h *handler) login(c *gin.Context) {
 

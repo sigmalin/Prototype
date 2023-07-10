@@ -50,7 +50,7 @@ func (h *handler) getSession(c *gin.Context) (session.Session, error) {
 // @version 1.0
 // @produce application/json
 // @Success 200 {object} response.Body{data=content.content} "Success"
-// @Failure 400 {object} response.Body "Failure"
+// @Failure 400 {object} response.Body "Get Session Failure"
 // @Router /test/query/session [get]
 func (h *handler) sessionContent(c *gin.Context) {
 
