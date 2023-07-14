@@ -12,7 +12,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"connect/db"
-	"session"
+	"jwtGin"
 	"uid"
 
 	"api/users/login"
@@ -20,16 +20,16 @@ import (
 )
 
 type handler struct {
-	generator  uid.Generator
-	sessionMgr *session.SessionManager
-	mainDB     *sql.DB
+	generator uid.Generator
+	mainDB    *sql.DB
+	jwtMgr    *jwtGin.Manager
 }
 
 func newHandler() *handler {
 	return &handler{
-		generator:  uid.GetGenerator(config.UID_GENERATOR_KEY),
-		sessionMgr: session.GetManager(config.SESSION_MANAGER_KEY),
-		mainDB:     db.GetDB(config.SQL_DATABASE),
+		generator: uid.GetGenerator(config.UID_GENERATOR_KEY),
+		mainDB:    db.GetDB(config.SQL_DATABASE),
+		jwtMgr:    jwtGin.NewManager(config.JWT_SIGNING_KEY),
 	}
 }
 
@@ -50,15 +50,11 @@ func (h *handler) newToken() string {
 	return uid
 }
 
-func (h *handler) newSession(c *gin.Context) session.Session {
-	return h.sessionMgr.SessionStart(c.Writer, c.Request)
-}
-
 // @Summary User Signin
 // @Tags users
 // @version 1.0
 // @produce application/json
-// @Success 200 {object} response.Body{data=signin.signInData} "Success"
+// @Success 200 {object} response.Body{data=signinData.Content} "Success"
 // @Router /users/signin [get]
 func (h *handler) signin(c *gin.Context) {
 
@@ -70,8 +66,8 @@ func (h *handler) signin(c *gin.Context) {
 	args := signin.NewArguments(
 		h.mainDB,
 		ctx,
-		h.newSession(c),
-		h.newToken())
+		h.newToken(),
+		h.jwtMgr)
 
 	signin.SignIn(args, res)
 
@@ -83,7 +79,7 @@ func (h *handler) signin(c *gin.Context) {
 // @version 1.0
 // @produce application/json
 // @Param token formData string true "login token"
-// @Success 200 {object} response.Body{data=login.logInData} "Success"
+// @Success 200 {object} response.Body{data=loginData.Content} "Success"
 // @Failure 400 {object} response.Body "Login Failure"
 // @Router /users/login [post]
 func (h *handler) login(c *gin.Context) {
@@ -98,8 +94,8 @@ func (h *handler) login(c *gin.Context) {
 	args := login.NewArguments(
 		h.mainDB,
 		ctx,
-		h.newSession(c),
-		token)
+		token,
+		h.jwtMgr)
 
 	login.LogIn(args, res)
 

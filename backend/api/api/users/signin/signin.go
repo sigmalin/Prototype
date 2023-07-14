@@ -7,27 +7,24 @@ import (
 	"response"
 	"time"
 
+	"jwtGin"
+	"model/signinData"
 	"response/code"
-	"session"
 )
 
 type Arguments struct {
-	db      *sql.DB
-	ctx     context.Context
-	session session.Session
-	token   string
+	db     *sql.DB
+	ctx    context.Context
+	token  string
+	jwtMgr *jwtGin.Manager
 }
 
-type signInData struct {
-	Token string `json:"Token" example:"d704e538-4f2f-486d-a2a1-a2b0ad3b4fe7"`
-}
-
-func NewArguments(db *sql.DB, ctx context.Context, session session.Session, token string) *Arguments {
+func NewArguments(db *sql.DB, ctx context.Context, token string, jwtMgr *jwtGin.Manager) *Arguments {
 	return &Arguments{
-		db:      db,
-		ctx:     ctx,
-		session: session,
-		token:   token,
+		db:     db,
+		ctx:    ctx,
+		token:  token,
+		jwtMgr: jwtMgr,
 	}
 }
 
@@ -56,8 +53,12 @@ func SignIn(args *Arguments, res *response.Body) {
 		return
 	}
 
-	args.session.Set(userID)
+	data, err4 := signinData.NewContent(args.token, userID, args.jwtMgr)
+	if err4 != nil {
+		res.Error(code.SIGNIN_FAIURE, err4.Error())
+		return
+	}
 
-	res.Data = &signInData{Token: args.token}
+	res.Data = data
 
 }

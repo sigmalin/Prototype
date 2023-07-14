@@ -11,6 +11,9 @@ var (
 	SSL_CERTIFICATION string
 	SSL_PRIVATE_KEY   string
 
+	JWT_SIGNING_KEY string
+	JWT_CLAIMS_KEY  string
+
 	SQL_DRIVER         string
 	SQL_USERNAME       string
 	SQL_PASSWORD       string
@@ -36,6 +39,9 @@ func init() {
 	API_PORT = os.Getenv("API_PORT")
 	SSL_CERTIFICATION = os.Getenv("SSL_CERTIFICATION")
 	SSL_PRIVATE_KEY = os.Getenv("SSL_PRIVATE_KEY")
+
+	JWT_SIGNING_KEY = os.Getenv("JWT_SIGNING_KEY")
+	JWT_CLAIMS_KEY = os.Getenv("JWT_CLAIMS_KEY")
 
 	SQL_DRIVER = os.Getenv("SQL_DRIVER")
 	SQL_USERNAME = os.Getenv("SQL_USERNAME")

@@ -6,19 +6,23 @@ use (
 	./api/test/helloworld
 	./api/test/query
 	./api/test/query/all-users
-	./api/test/query/session-content
 	./api/users
 	./api/users/login
 	./api/users/signin
 	./cmd
 	./configs
 	./init
-	./internal/connect/db
-	./internal/connect/redis
-	./internal/response
-	./internal/response/code
-	./internal/session-provider/redis
-	./internal/uid/satori
+	./internal/pkg/connect/db
+	./internal/pkg/connect/redis
+	./internal/pkg/jwt
+	./internal/pkg/middleware/cors
+	./internal/pkg/middleware/jwt
+	./internal/pkg/model/login
+	./internal/pkg/model/signin
+	./internal/pkg/response
+	./internal/pkg/response/code
 	./pkg/session
+	./pkg/session/provider/redis
 	./pkg/uid
+	./pkg/uid/satori
 )

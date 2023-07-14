@@ -24,6 +24,8 @@ services:
             API_PORT: :1234
             SSL_CERTIFICATION: ./ssl/server.pem
             SSL_PRIVATE_KEY: ./ssl/server.key 
+            JWT_SIGNING_KEY: SIGMA_SIGNING_KEY
+            JWT_CLAIMS_KEY: JWT_CLAIMS
             SQL_DRIVER: mysql
             SQL_USERNAME: root
             SQL_PASSWORD: 1111

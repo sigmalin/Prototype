@@ -6,26 +6,24 @@ import (
 	"response"
 	"time"
 
+	"jwtGin"
+	"model/loginData"
 	"response/code"
-	"session"
 )
 
 type Arguments struct {
-	db      *sql.DB
-	ctx     context.Context
-	session session.Session
-	token   string
+	db     *sql.DB
+	ctx    context.Context
+	token  string
+	jwtMgr *jwtGin.Manager
 }
 
-type logInData struct {
-}
-
-func NewArguments(db *sql.DB, ctx context.Context, session session.Session, token string) *Arguments {
+func NewArguments(db *sql.DB, ctx context.Context, token string, jwtMgr *jwtGin.Manager) *Arguments {
 	return &Arguments{
-		db:      db,
-		ctx:     ctx,
-		session: session,
-		token:   token,
+		db:     db,
+		ctx:    ctx,
+		token:  token,
+		jwtMgr: jwtMgr,
 	}
 }
 
@@ -51,10 +49,13 @@ func LogIn(args *Arguments, res *response.Body) {
 		return
 	}
 
-	args.session.Set(userID)
+	data, err4 := loginData.NewContent(userID, args.jwtMgr)
+	if err4 != nil {
+		res.Error(code.LOGIN_FAIURE, err4.Error())
+		return
+	}
 
-	// TODO : Login Data
-	res.Data = &logInData{}
+	res.Data = data
 }
 
 func updateLoginTime(args *Arguments, userID int64) error {

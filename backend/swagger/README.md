@@ -54,8 +54,8 @@ cd ../
 // @contact.name sigma
 // @contact.url https://github.com/sigmalin/Prototype
 
-// @host 127.0.0.1:80
-// @schemes http
+// @host 127.0.0.1:443
+// @schemes https
 func main() {
 }
 ```
@@ -66,5 +66,23 @@ func main() {
 swag init -g cmd/main.go -o ../swagger/doc/
 ```
 
+# Swagger UI 代碼生成
+
+- 使用 [Swagger Codegen](https://github.com/swagger-api/swagger-codegen)
+
+- 使用 docker image 進行轉換
+
+- 轉換後的檔案，存放在 convert 資料夾內
+
+| SHELL 檔案名稱 | 功能 |
+|:-:|:--|
+|openapi|將 [Swaggo/swag](https://github.com/swaggo/swag) 產生的 openAPI 2.0 轉換成 openAPI 3.0 格式|
+|csharp|自動生成 csharp client端檔案|
+
+執行指令
+
+```console
+sh openapi.sh
+```
 
     

@@ -13,7 +13,7 @@ func AllService() {
 
 	wg.Add(3)
 
-	initSession(wg)
+	initRedis(wg)
 
 	initDB(wg)
 

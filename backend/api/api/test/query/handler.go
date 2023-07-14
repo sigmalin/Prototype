@@ -11,21 +11,17 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"connect/db"
-	"session"
 
 	"api/test/query/allusers"
-	content "api/test/query/sessioncontent"
 )
 
 type handler struct {
-	sessionMgr *session.SessionManager
-	mainDB     *sql.DB
+	mainDB *sql.DB
 }
 
 func newHandler() *handler {
 	return &handler{
-		sessionMgr: session.GetManager(config.SESSION_MANAGER_KEY),
-		mainDB:     db.GetDB(config.SQL_DATABASE),
+		mainDB: db.GetDB(config.SQL_DATABASE),
 	}
 }
 
@@ -39,33 +35,6 @@ func (h *handler) send(c *gin.Context, res *response.Body) {
 	} else {
 		c.JSON(http.StatusBadRequest, res)
 	}
-}
-
-func (h *handler) getSession(c *gin.Context) (session.Session, error) {
-	return h.sessionMgr.SessionRead(c.Writer, c.Request)
-}
-
-// @Summary Query Session Content
-// @Tags test
-// @version 1.0
-// @produce application/json
-// @Success 200 {object} response.Body{data=content.content} "Success"
-// @Failure 400 {object} response.Body "Get Session Failure"
-// @Router /test/query/session [get]
-func (h *handler) sessionContent(c *gin.Context) {
-
-	res := h.newResponse()
-
-	ses, err := h.getSession(c)
-	if err != nil {
-		res.Error(code.SESSION_FAIURE, err.Error())
-		h.send(c, res)
-		return
-	}
-
-	content.Handle(ses, res)
-
-	h.send(c, res)
 }
 
 // @Summary Query All users
