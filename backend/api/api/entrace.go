@@ -5,6 +5,7 @@ import (
 
 	middleware "middleware/cors"
 
+	"api/me"
 	"api/test"
 	"api/users"
 )
@@ -17,4 +18,5 @@ func entrace(router *gin.Engine) {
 
 	test.RegisterEndPoints(router)
 	users.RegisterEndPoints(router)
+	me.RegisterEndPoints(router)
 }

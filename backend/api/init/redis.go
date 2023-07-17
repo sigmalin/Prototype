@@ -1,6 +1,7 @@
 package initial
 
 import (
+	"context"
 	"log"
 	"sync"
 	"time"
@@ -14,8 +15,10 @@ func initRedis(wg *sync.WaitGroup) {
 
 	log.Printf("start redis")
 
+	ctx := context.Background()
+
 	for {
-		_, err := connector.GetRedisClient(0)
+		_, err := connector.GetRedisClient(ctx, 0)
 		if err == nil {
 			break
 		}

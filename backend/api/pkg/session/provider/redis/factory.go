@@ -1,7 +1,7 @@
 package sredis
 
 import (
-	"github.com/go-redis/redis"
+	"github.com/go-redis/redis/v8"
 )
 
 func NewProvider(client *redis.Client) *redisProvider {

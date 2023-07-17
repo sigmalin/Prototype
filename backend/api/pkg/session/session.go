@@ -1,6 +1,7 @@
 package session
 
 import (
+	"context"
 	"crypto/rand"
 	"encoding/base64"
 	"io"
@@ -11,17 +12,17 @@ import (
 )
 
 type Session interface {
-	Set(value interface{}) error
-	Get() interface{}
-	Delete() error
+	Set(ctx context.Context, value interface{}) error
+	Get(ctx context.Context) interface{}
+	Delete(ctx context.Context) error
 	SessionID() string
 }
 
 type SessionProvider interface {
-	SessionInit(sid string) (Session, error)
-	SessionRead(sid string) (Session, error)
-	SessionDestroy(sid string) error
-	SessionGC(expires int)
+	SessionInit(ctx context.Context, sid string) (Session, error)
+	SessionRead(ctx context.Context, sid string) (Session, error)
+	SessionDestroy(ctx context.Context, sid string) error
+	SessionGC(ctx context.Context, expires int)
 }
 
 type SessionManager struct {
@@ -30,24 +31,24 @@ type SessionManager struct {
 	provider   SessionProvider
 }
 
-func (mgr *SessionManager) SessionStart(w http.ResponseWriter, r *http.Request) (session Session) {
+func (mgr *SessionManager) SessionStart(ctx context.Context, w http.ResponseWriter, r *http.Request) (session Session) {
 	mgr.lock.Lock()
 	defer mgr.lock.Unlock()
 
 	cookie, err := r.Cookie(mgr.cookieName)
 	if err != nil || cookie.Value == "" {
 		sid := mgr.sessionId()
-		session, _ = mgr.provider.SessionInit(sid)
+		session, _ = mgr.provider.SessionInit(ctx, sid)
 		cookie := http.Cookie{Name: mgr.cookieName, Value: url.QueryEscape(sid), Path: "/", HttpOnly: true, MaxAge: 0}
 		http.SetCookie(w, &cookie)
 	} else {
 		sid, _ := url.QueryUnescape(cookie.Value)
-		session, _ = mgr.provider.SessionRead(sid)
+		session, _ = mgr.provider.SessionRead(ctx, sid)
 	}
 	return
 }
 
-func (mgr *SessionManager) SessionRead(w http.ResponseWriter, r *http.Request) (Session, error) {
+func (mgr *SessionManager) SessionRead(ctx context.Context, w http.ResponseWriter, r *http.Request) (Session, error) {
 	mgr.lock.Lock()
 	defer mgr.lock.Unlock()
 
@@ -57,7 +58,7 @@ func (mgr *SessionManager) SessionRead(w http.ResponseWriter, r *http.Request) (
 	}
 
 	sid, _ := url.QueryUnescape(cookie.Value)
-	session, err := mgr.provider.SessionRead(sid)
+	session, err := mgr.provider.SessionRead(ctx, sid)
 	if err != nil {
 		expiration := time.Now()
 		cookie := http.Cookie{Name: mgr.cookieName, Path: "/", HttpOnly: true, Expires: expiration, MaxAge: -1}
@@ -67,7 +68,7 @@ func (mgr *SessionManager) SessionRead(w http.ResponseWriter, r *http.Request) (
 	return session, nil
 }
 
-func (mgr *SessionManager) SessionDestroy(w http.ResponseWriter, r *http.Request) {
+func (mgr *SessionManager) SessionDestroy(ctx context.Context, w http.ResponseWriter, r *http.Request) {
 	cookie, err := r.Cookie(mgr.cookieName)
 	if err != nil || cookie.Value == "" {
 		return
@@ -75,19 +76,19 @@ func (mgr *SessionManager) SessionDestroy(w http.ResponseWriter, r *http.Request
 		mgr.lock.Lock()
 		defer mgr.lock.Unlock()
 
-		mgr.provider.SessionDestroy(cookie.Value)
+		mgr.provider.SessionDestroy(ctx, cookie.Value)
 		expiration := time.Now()
 		cookie := http.Cookie{Name: mgr.cookieName, Path: "/", HttpOnly: true, Expires: expiration, MaxAge: -1}
 		http.SetCookie(w, &cookie)
 	}
 }
 
-func (mgr *SessionManager) GC(expires int) {
+func (mgr *SessionManager) GC(ctx context.Context, expires int) {
 	mgr.lock.Lock()
 	defer mgr.lock.Unlock()
 
-	mgr.provider.SessionGC(expires)
-	time.AfterFunc(time.Duration(expires)*time.Second, func() { mgr.GC(expires) })
+	mgr.provider.SessionGC(ctx, expires)
+	time.AfterFunc(time.Duration(expires)*time.Second, func() { mgr.GC(ctx, expires) })
 }
 
 func (mgr *SessionManager) sessionId() string {

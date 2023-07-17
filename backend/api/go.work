@@ -2,6 +2,8 @@ go 1.20
 
 use (
 	./api
+	./api/me
+	./api/me/bank
 	./api/test
 	./api/test/helloworld
 	./api/test/query
@@ -17,6 +19,7 @@ use (
 	./internal/pkg/jwt
 	./internal/pkg/middleware/cors
 	./internal/pkg/middleware/jwt
+	./internal/pkg/model/bank
 	./internal/pkg/model/login
 	./internal/pkg/model/signin
 	./internal/pkg/response

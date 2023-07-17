@@ -10,6 +10,7 @@
 
 ```go
 import (
+    "context"
 	"github.com/go-redis/redis"
     "session"
     provider "session/provider/redis"
@@ -32,7 +33,7 @@ func main() {
 	session.RegisterSessionManager("session manager key", mgr)
 
     // 處理過期的 session (秒)
-    go mgr.GC(180)
+    go mgr.GC(context.Background(), 180)
 }
 ```
 
@@ -40,6 +41,7 @@ func main() {
 
 ```go
 import (
+    "context"
     "github.com/gin-gonic/gin"
 	"session"
 )
@@ -47,23 +49,23 @@ import (
 // 產生新的 session
 func NewSession(c *gin.Context) session.Session {
     sessionMgr := session.GetManager("session manager key")
-	return sessionMgr.SessionStart(c.Writer, c.Request)
+	return sessionMgr.SessionStart(context.Background(), c.Writer, c.Request)
 }
 
 // 設定 session 值
 func SetSeeeion(s session.Session, value interface{}) {
-    s.Set(value)
+    s.Set(context.Background(), value)
 }
 
 // 取得 session 值
 func GetSeeeion(c *gin.Context) (interface{}, error) {
     sessionMgr := session.GetManager("session manager key")
-    s, err := sessionMgr.SessionRead(c.Writer, c.Request)
+    s, err := sessionMgr.SessionRead(context.Background(), c.Writer, c.Request)
     if err != nil {
         // 沒有 session 資料
         return nil, err
     }
-    return s.Get(), nil 
+    return s.Get(context.Background()), nil 
 }
 ```
 

@@ -1,15 +1,16 @@
 package credis
 
 import (
+	"context"
 	"fmt"
 	"log"
 
 	"config"
 
-	"github.com/go-redis/redis"
+	"github.com/go-redis/redis/v8"
 )
 
-func connect(db int) (*redis.Client, error) {
+func connect(ctx context.Context, db int) (*redis.Client, error) {
 	conn := fmt.Sprintf("%s:%d", config.REDIS_ADDRESS, config.REDIS_PORT)
 
 	client := redis.NewClient(&redis.Options{
@@ -18,7 +19,7 @@ func connect(db int) (*redis.Client, error) {
 		DB:       db,
 	})
 
-	_, err := client.Ping().Result()
+	_, err := client.Ping(ctx).Result()
 	if err != nil {
 		log.Print(err)
 	}
