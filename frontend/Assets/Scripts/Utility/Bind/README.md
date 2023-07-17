@@ -6,7 +6,7 @@
 
 ## 原理
 
-- 將遊戲內容分成 model (3D 模型) - View (UI 介面) - Presenter (程式碼)
+- 將遊戲內容分成 model (數據資料) - View (畫面元件) - Presenter (程式碼操作)
 - 每個部份各自獨立，透過 Presenter 去操作 model 和 View。
 - 為了讓 Presnter 能夠操作 model 和 View，需要再 model 和 View 上面標記要操作的元件位置
 - 透過掛載在 model 和 View 上面的 bind component，讓 Presenter 能夠找到該元件並進行操作
