@@ -20,7 +20,7 @@ import (
 // @name Authorization
 // @description Type "Bearer" followed by a space and JWT token.
 
-// @host 127.0.0.1:80
+// @host 127.0.0.1:80/api
 // @schemes http
 func main() {
 
