@@ -1,9 +1,11 @@
 package bankData
 
 import (
-	cacher "cache/redis"
 	"context"
 	"database/sql"
+	"errors"
+
+	cacher "cache/redis"
 )
 
 type Content struct {
@@ -38,6 +40,15 @@ func NewContent(ctx context.Context, db *sql.DB, id string) (interface{}, error)
 func GetCache(ctx context.Context, db *sql.DB, id string) (interface{}, error) {
 	return cacher.Search(CacheKey(id), func() (interface{}, error) {
 		return NewContent(ctx, db, id)
+	})
+}
+
+func SetCache(id string, content *Content) (interface{}, error) {
+	return cacher.Search(CacheKey(id), func() (interface{}, error) {
+		if content == nil {
+			return nil, errors.New("content is nil")
+		}
+		return content, nil
 	})
 }
 

@@ -51,7 +51,14 @@ func Handle(args *Arguments, res *response.Body) {
 		return
 	}
 
-	data, err4 := bankData.GetCache(args.ctx, args.db, args.id)
+	context := &bankData.Content{
+		Coin:     args.coin,
+		Faith:    args.faith,
+		Gems:     args.gems,
+		Treasure: args.treasure,
+	}
+
+	data, err4 := bankData.SetCache(args.id, context)
 	if err4 != nil {
 		res.Error(code.UNKNOWN_ERROR, err4.Error())
 		return
