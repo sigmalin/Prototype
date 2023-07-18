@@ -36,10 +36,9 @@ services:
             SQL_MAXLIFETIME: 10
             SQL_MAXOPENCONNECT: 1
             SQL_MAXIDLECONNECT: 1
-            REDIS_ADDRESS: go_redis
-            REDIS_PORT: 6379
-            SESSION_NAME: SIGMA_SESSION_KEY
-            SESSION_EXPIRATION: 300
+            REDIS_CACHE_ADDRESS: go_redis
+            REDIS_CACHE_PORT: 6379
+            REDIS_CACHE_EXPIRATION: 600
         volumes:
             - ./ssl:/ssl
     #定義啟動的DB名稱

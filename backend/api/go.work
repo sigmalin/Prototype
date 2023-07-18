@@ -6,6 +6,8 @@ use (
 	./api/me/bank
 	./api/test
 	./api/test/helloworld
+	./api/test/modify
+	./api/test/modify/bank
 	./api/test/query
 	./api/test/query/all-users
 	./api/users
@@ -14,6 +16,7 @@ use (
 	./cmd
 	./configs
 	./init
+	./internal/pkg/cache/redis
 	./internal/pkg/connect/db
 	./internal/pkg/connect/redis
 	./internal/pkg/jwt

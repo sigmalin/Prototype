@@ -1,10 +1,10 @@
 package sredis
 
 import (
-	"config"
 	"context"
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/go-redis/redis/v8"
 )
@@ -15,7 +15,7 @@ type redisSession struct {
 }
 
 func (rs *redisSession) Set(ctx context.Context, value interface{}) error {
-	return rs.client.Set(ctx, rs.sid, value, config.SESSION_DURATION).Err()
+	return rs.client.Set(ctx, rs.sid, value, time.Hour).Err()
 }
 
 func (rs *redisSession) Get(ctx context.Context) interface{} {
@@ -46,6 +46,6 @@ func (rs *redisSession) Update(ctx context.Context) error {
 		return fmt.Errorf("session not exist")
 	}
 
-	_, err2 := rs.client.Expire(ctx, rs.sid, config.SESSION_DURATION).Result()
+	_, err2 := rs.client.Expire(ctx, rs.sid, time.Hour).Result()
 	return err2
 }

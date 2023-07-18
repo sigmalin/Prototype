@@ -1,30 +1,19 @@
 package initial
 
 import (
-	"context"
 	"log"
 	"sync"
-	"time"
 
-	connector "connect/redis"
+	cache "cache/redis"
 )
 
-func initRedis(wg *sync.WaitGroup) {
+func initRedisCache(wg *sync.WaitGroup) {
 
 	defer wg.Done()
 
-	log.Printf("start redis")
+	log.Printf("start redis cache")
 
-	ctx := context.Background()
+	cache.GetInstance()
 
-	for {
-		_, err := connector.GetRedisClient(ctx, 0)
-		if err == nil {
-			break
-		}
-
-		time.Sleep(1 * time.Second)
-	}
-
-	log.Printf("redis completed")
+	log.Printf("redis cache completed")
 }

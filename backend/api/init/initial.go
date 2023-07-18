@@ -13,7 +13,7 @@ func AllService() {
 
 	wg.Add(3)
 
-	initRedis(wg)
+	initRedisCache(wg)
 
 	initDB(wg)
 
