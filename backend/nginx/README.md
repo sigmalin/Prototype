@@ -1,6 +1,14 @@
 ## Prototype - nginx
 
-<br><br>
+<br>
+
+語言:
+
+* [English](README_en.md)
+
+---
+
+<br>
 
 # 介紹
 
