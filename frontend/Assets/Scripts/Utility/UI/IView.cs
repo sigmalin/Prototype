@@ -37,6 +37,5 @@ namespace UI
         void SetParent(IView view);
         bool Open(IView view);
         void Close(IView view);
-        void Clear(ViewLayer layer);
     }
 }

@@ -9,8 +9,8 @@ namespace Network.WebRequest.Provider
 {
     public interface IProvider
     {
-        Task<Tuple<Result, string>> Get(string api);
-        Task<Tuple<Result, string>> Post(string api, Dictionary<string, string> field);
+        Task<Tuple<Result, string>> Get(string api, Dictionary<string, string> header);
+        Task<Tuple<Result, string>> Post(string api, Dictionary<string, string> field, Dictionary<string, string> header);
     }
 }
 

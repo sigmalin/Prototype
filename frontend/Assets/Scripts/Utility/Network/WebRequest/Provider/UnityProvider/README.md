@@ -1,3 +1,7 @@
+## Prototype - frontend
+
+<br><br>
+
 # UnityProvider
 
 ## 介紹
@@ -10,4 +14,4 @@
 
     | 成員變數 | 說明 |
     |:-:|:--|
-    |RetryTimeOut|指定秒數內沒有收到伺服器回應就終止等待|
+    |TimeOut|指定秒數內沒有收到伺服器回應就終止等待|

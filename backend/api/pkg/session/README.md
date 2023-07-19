@@ -1,8 +1,12 @@
+## Prototype - API Server 
 `專案不使用`
+<br><br>
 
 # 介紹
 
 - Session 工具
+
+<br><br>
     
 # 使用方法
 
@@ -68,6 +72,8 @@ func GetSeeeion(c *gin.Context) (interface{}, error) {
     return s.Get(context.Background()), nil 
 }
 ```
+
+<br><br>
 
 # 備記
 

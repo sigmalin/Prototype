@@ -12,6 +12,8 @@ namespace Network.WebRequest.Protocol
         Task<T> Post<T>(string api, Dictionary<string, string> field) where T : ServerResponse;
 
         void Inject(IProvider provider);
+
+        void Authorization(string auth);
     }
 }
 

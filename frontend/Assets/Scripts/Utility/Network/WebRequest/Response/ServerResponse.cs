@@ -5,9 +5,9 @@ using UnityEngine;
 
 namespace Network.WebRequest.Response
 {
-    public class ServerResponse
+    public abstract class ServerResponse
     {
-        public virtual Result Result { get; private set; }
+        public Result Result { get; private set; }
 
         public ServerResponse(Result result)
         {

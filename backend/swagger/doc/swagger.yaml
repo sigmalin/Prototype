@@ -1,0 +1,221 @@
+definitions:
+  allusers.user:
+    properties:
+      Name:
+        example: sigma
+        type: string
+      Token:
+        example: d704e538-4f2f-486d-a2a1-a2b0ad3b4fe7
+        type: string
+      UserID:
+        example: 7
+        type: integer
+    type: object
+  bankData.Content:
+    properties:
+      Coin:
+        example: 1000
+        type: integer
+      Faith:
+        example: 0
+        type: integer
+      Gems:
+        example: 0
+        type: integer
+      Treasure:
+        example: 0
+        type: integer
+    type: object
+  helloworld.content:
+    properties:
+      message:
+        example: hello world
+        type: string
+    type: object
+  loginData.Content:
+    properties:
+      JWT:
+        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+        type: string
+    type: object
+  response.Body:
+    properties:
+      code:
+        example: 0
+        type: integer
+      data: {}
+      message:
+        example: ""
+        type: string
+    type: object
+  signinData.Content:
+    properties:
+      Token:
+        example: d704e538-4f2f-486d-a2a1-a2b0ad3b4fe7
+        type: string
+      login:
+        $ref: '#/definitions/loginData.Content'
+    type: object
+host: 127.0.0.1:80/api
+info:
+  contact:
+    name: sigma
+    url: https://github.com/sigmalin/Prototype
+  description: Standard Api Server
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  title: Prototype Api Server
+  version: "1.0"
+paths:
+  /me/bank:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Body'
+            - properties:
+                data:
+                  $ref: '#/definitions/bankData.Content'
+              type: object
+      security:
+      - Bearer: []
+      summary: Query My Bank Data
+      tags:
+      - me
+  /test/helloworld:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Body'
+            - properties:
+                data:
+                  $ref: '#/definitions/helloworld.content'
+              type: object
+      summary: Recive HelloWorld from server
+      tags:
+      - test
+  /test/modify/bank:
+    post:
+      parameters:
+      - description: userID
+        in: formData
+        name: userID
+        required: true
+        type: string
+      - description: Coin
+        in: formData
+        name: Coin
+        required: true
+        type: string
+      - description: Faith
+        in: formData
+        name: Faith
+        required: true
+        type: string
+      - description: Gems
+        in: formData
+        name: Gems
+        required: true
+        type: string
+      - description: Treasures
+        in: formData
+        name: Treasures
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Body'
+            - properties:
+                data:
+                  $ref: '#/definitions/bankData.Content'
+              type: object
+      summary: Modify user's bank data
+      tags:
+      - test
+  /test/query/allusers:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Body'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/allusers.user'
+                  type: array
+              type: object
+      summary: Query All users
+      tags:
+      - test
+  /users/login:
+    post:
+      parameters:
+      - description: login token
+        in: formData
+        name: token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Body'
+            - properties:
+                data:
+                  $ref: '#/definitions/loginData.Content'
+              type: object
+        "400":
+          description: Login Failure
+          schema:
+            $ref: '#/definitions/response.Body'
+      summary: User Login
+      tags:
+      - users
+  /users/signin:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Body'
+            - properties:
+                data:
+                  $ref: '#/definitions/signinData.Content'
+              type: object
+      summary: User Signin
+      tags:
+      - users
+schemes:
+- http
+securityDefinitions:
+  Bearer:
+    description: Type "Bearer" followed by a space and JWT token.
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

@@ -58,6 +58,8 @@ namespace UI
                 view.root.SetParent(root);
                 view.root.localPosition = Vector3.zero;
                 view.root.localScale = Vector3.one;
+                view.root.offsetMin = Vector2.zero;
+                view.root.offsetMax = Vector2.zero;
             }
         }
 

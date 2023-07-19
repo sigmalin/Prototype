@@ -9,11 +9,11 @@ namespace Network.WebRequest.Provider
     {
         public ProviderType Type => ProviderType.UnityProvider;
 
-        public int RetryTimeOut { get; private set; }
+        public int TimeOut { get; private set; }
 
-        public UnityProviderOrder(int retry)
+        public UnityProviderOrder()
         {
-            RetryTimeOut = retry;
+            TimeOut = 5;
         }
     }
 }

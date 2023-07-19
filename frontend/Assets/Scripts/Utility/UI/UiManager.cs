@@ -102,7 +102,15 @@ namespace UI
 
         public void ClearLayer(ViewLayer layer)
         {
-            viewManager?.Clear(layer);
+            var pairs = table.Where(_ => _.Value.Layer == layer)
+                                    .ToArray();
+
+            for(int i = 0; i < pairs.Length; ++i)
+            {
+                table.Remove(pairs[i].Key);
+
+                closeView(pairs[i].Value);
+            }
         }
 
         UiPresenter openView<T>(UiPresenter presenter) where T : UiPresenter, new()

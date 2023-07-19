@@ -65,6 +65,7 @@ namespace Bind.Presenter
             release();
         }
 
+
         void IView.open()
         {
             viewState = ViewState.Open;

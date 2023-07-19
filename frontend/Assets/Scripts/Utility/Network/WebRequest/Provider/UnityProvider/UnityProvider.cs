@@ -11,43 +11,41 @@ namespace Network.WebRequest.Provider
 {
     class UnityProvider : IProvider
     {
-        int retryTimeOut;
-
+        int timeOut = 5;
         public UnityProvider(UnityProviderOrder order)
         {
-            retryTimeOut = order.RetryTimeOut;
+            timeOut = order.TimeOut;
         }
 
-        public async Task<Tuple<Result, string>> Get(string api)
+        public async Task<Tuple<Result, string>> Get(string api, Dictionary<string, string> header)
         {
-            UnityWebRequest request = UnityWebRequest.Get(api);
-            request.certificateHandler = new SkipCertificate();
+            using (UnityWebRequest request = UnityWebRequest.Get(api))
+            {
+                request.certificateHandler = new SkipCertificate();
+                request.SetRequestHeaders(header);
+                request.timeout = timeOut;
 
-            request.timeout = retryTimeOut;
+                await request.SendWebRequest();
 
-            await request.SendWebRequest();
-
-            return parseResult(request);
+                return parseResult(request);
+            }                
         }
 
-        public async Task<Tuple<Result, string>> Post(string api, Dictionary<string, string> field)
+        public async Task<Tuple<Result, string>> Post(string api, Dictionary<string, string> field, Dictionary<string, string> header)
         {
             WWWForm form = new WWWForm();
+            form.SetField(field);
 
-            var etor = field.GetEnumerator();
-            while (etor.MoveNext())
+            using (UnityWebRequest request = UnityWebRequest.Post(api, form))
             {
-                field.Add(etor.Current.Key, etor.Current.Value);
+                request.certificateHandler = new SkipCertificate();
+                request.SetRequestHeaders(header);
+                request.timeout = timeOut;
+
+                await request.SendWebRequest();
+
+                return parseResult(request);
             }
-
-            UnityWebRequest request = UnityWebRequest.Post(api, form);
-            request.certificateHandler = new SkipCertificate();
-
-            request.timeout = retryTimeOut;
-
-            await request.SendWebRequest();
-
-            return parseResult(request);
         }
 
         Tuple<Result, string> parseResult(UnityWebRequest request)
@@ -76,6 +74,34 @@ namespace Network.WebRequest.Provider
     }
 
     static class UnityWebRequestExtension
+    {
+        public static void SetRequestHeaders(this UnityWebRequest request, Dictionary<string, string> header)
+        {
+            if (header == null) return;
+
+            var etor = header.GetEnumerator();
+            while (etor.MoveNext())
+            {
+                request.SetRequestHeader(etor.Current.Key, etor.Current.Value);
+            }
+        }
+    }
+
+    static class WWWFormExtension
+    {
+        public static void SetField(this WWWForm form, Dictionary<string, string> field)
+        {
+            if (field == null) return;
+
+            var etor = field.GetEnumerator();
+            while (etor.MoveNext())
+            {
+                form.AddField(etor.Current.Key, etor.Current.Value);
+            }
+        }
+    }
+
+    static class UnityWebRequestAsyncOperationExtension
     {
         public static TaskAwaiter<object> GetAwaiter(this UnityWebRequestAsyncOperation asyncop)
         {

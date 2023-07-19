@@ -1,14 +1,18 @@
-# Prototype
+## Prototype - frontend
 
-## 介紹
+<br><br>
+
+# 介紹
 
 - 前端腳本
 
-## 內容
+<br><br>
+
+# 內容
 
 | 資料夾 | 功能 |
 |:--|:--|
-|NetworkData|存放 Server 回傳資料結構|
+|NetworkData|網路資料結構宣告，針對後端伺服器分類存放，目前儲存 Prototype Api Server 所有的訊息格式|
 |Services|宣告 Prototype 前端使用的常駐服務|
 |Utility|自訂的工具庫|
     

@@ -1,0 +1,1 @@
+docker run --rm -v ${PWD}:/local swaggerapi/swagger-codegen-cli-v3 generate -i /local/doc/swagger.yaml -l openapi-yaml -o /local/convert/openapi3

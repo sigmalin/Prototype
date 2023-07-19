@@ -1,15 +1,25 @@
+## Prototype - Swagger
+
+<br><br>
+
 # 介紹
 
 - API Server 使用的 Swagger UI Server 設定
+
+<br><br>
 
 # 架構
 
 - 將 Swagger UI Server 獨立， 處理 API Server 的 API 事件
 
+<br><br>
+
 # CORS
 
 - 因為將 Swagger UI Server 獨立，從 Client 端透過 Swagger UI Server 發送的 API 到 API Sertver 會有跨網域問題
 - 需透過 nginx 處理 CORS
+
+<br><br>
 
 # Swagger UI 文件生成
 
@@ -66,6 +76,8 @@ func main() {
 swag init -g cmd/main.go -o ../swagger/doc/
 ```
 
+<br><br>
+
 # Swagger UI 代碼生成
 
 - 使用 [Swagger Codegen](https://github.com/swagger-api/swagger-codegen)
@@ -85,4 +97,9 @@ swag init -g cmd/main.go -o ../swagger/doc/
 sh openapi.sh
 ```
 
+<br><br>
+
+# TODO
+
+- 目前產生的 csharp 代碼無法用在 prototype frontend(需安裝額外套件 & 產生的變數名稱不明瞭)，故先保留轉換功能，等之後進行擴充
     

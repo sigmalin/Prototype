@@ -63,12 +63,6 @@ namespace Bind.Presenter
             IViewLayerOperator viewLayerOperator = getViewLayerOperator(view.Layer);
             viewLayerOperator?.Close(view);
         }
-
-        void IViewManager.Clear(ViewLayer layer)
-        {
-            IViewLayerOperator viewLayerOperator = getViewLayerOperator(layer);
-            viewLayerOperator?.Clear();
-        }
     }
 }
 
