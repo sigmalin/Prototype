@@ -23,8 +23,8 @@
 |api|建構 Api Server 相關代碼|
 |bundles|提供 frontend 下載資源的存放位置|
 |file|建構 FTP Server 相關代碼，提供 frontend 下載 bundles 資料夾內的檔案服務|
+|mongodb|建構 Mongo DB 的相關文件，Schema 設計規則與問題排除方式|
 |nginx|反向代理伺服 config 存放位置，解決 cors 問題所設定|
-|sql|database 資料(data) 和 欄位設計(schema) 的存放位置|
 |ssl|ssl 金鑰的存放位置|
 |swagger|swagger 腳本存放位置|
 
