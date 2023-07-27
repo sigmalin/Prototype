@@ -8,7 +8,6 @@ using UI;
 using System.Linq;
 using Services;
 using Singleton;
-using NetworkData.ApiServer.Model.me;
 
 namespace Demo.Entrance
 {
@@ -41,19 +40,11 @@ namespace Demo.Entrance
 
         async void getUserData()
         {
-            await getBankData();
+            openGameBar();
 
             await waitPresentsBinding();
 
             GameServices.UI.Close<EntrancePresenter>();
-        }
-
-        async Task getBankData()
-        {
-            var model = Singleton<BankModel>.Instance;
-            await model.Update();
-
-            openGameBar();
         }
 
         void openGameBar()

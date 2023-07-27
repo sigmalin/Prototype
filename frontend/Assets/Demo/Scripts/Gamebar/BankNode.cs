@@ -4,9 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Bind.Presenter;
-using NetworkData.ApiServer.Model.me;
 using UnityEngine;
 using UnityEngine.UI;
+using Singleton;
+using NetworkData.ApiServer.Model;
 
 namespace Demo.Gamebar
 {
@@ -33,14 +34,14 @@ namespace Demo.Gamebar
             treasure = PresenterMaker.Binding<BankDataNode>(getBindData("treasureNode").Target);
         }
 
-        public void Update(bank data)
+        public void Update()
         {
-            if (data == null) return;
+            var profile = Singleton<Profile>.Instance;
 
-            coin.SetValue(data.Coin);
-            faith.SetValue(data.Faith);
-            gems.SetValue(data.Gems);
-            treasure.SetValue(data.Tresure);
+            coin.SetValue(profile.Coin);
+            faith.SetValue(profile.Faith);
+            gems.SetValue(profile.Gems);
+            treasure.SetValue(profile.Treasure);
 
             LayoutRebuilder.ForceRebuildLayoutImmediate(target.transform as RectTransform);
         }

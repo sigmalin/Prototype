@@ -2,14 +2,18 @@ package bank
 
 import (
 	"context"
-	"database/sql"
-	"modal/bankData"
+	"modal/user/bankData"
+	"model/userData"
 	"response"
 	"response/code"
+
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type Arguments struct {
-	db       *sql.DB
+	db       *mongo.Database
 	ctx      context.Context
 	id       string
 	coin     int64
@@ -18,7 +22,11 @@ type Arguments struct {
 	treasure int64
 }
 
-func NewArguments(db *sql.DB, ctx context.Context, id string, coin int64, faith int64, gems int64, treasure int64) *Arguments {
+type Result struct {
+	Bank bankData.Content `json:"Bank"`
+}
+
+func NewArguments(db *mongo.Database, ctx context.Context, id string, coin int64, faith int64, gems int64, treasure int64) *Arguments {
 	return &Arguments{
 		db:       db,
 		ctx:      ctx,
@@ -30,39 +38,50 @@ func NewArguments(db *sql.DB, ctx context.Context, id string, coin int64, faith 
 	}
 }
 
-func Handle(args *Arguments, res *response.Body) {
+func Handle(args *Arguments, resp *response.Body) {
 
-	prepare, err1 := args.db.PrepareContext(args.ctx, "Update Bank SET Coin = ?, Faith = ?, Gems = ?, Treasure = ? WHERE UserID = ?")
+	userID, err := primitive.ObjectIDFromHex(args.id)
+	if err != nil {
+		resp.Error(code.INPUT_FAIURE, err.Error())
+		return
+	}
+
+	filter := bson.D{{Key: "_id", Value: userID}}
+	update := bson.D{{Key: "$set", Value: bson.D{
+		{Key: "Bank", Value: bson.D{
+			{Key: "Coin", Value: args.coin},
+			{Key: "Faith", Value: args.faith},
+			{Key: "Gems", Value: args.gems},
+			{Key: "Treasure", Value: args.treasure},
+		}},
+	}}}
+
+	result, err1 := args.db.Collection("users").UpdateOne(args.ctx, filter, update)
 	if err1 != nil {
-		res.Error(code.DATA_NOT_FIND, err1.Error())
-		return
-	}
-	defer prepare.Close()
-
-	_, err2 := prepare.ExecContext(args.ctx, args.coin, args.faith, args.gems, args.treasure, args.id)
-	if err2 != nil {
-		res.Error(code.UNKNOWN_ERROR, err2.Error())
+		resp.Error(code.DATA_NOT_FIND, err1.Error())
 		return
 	}
 
-	err3 := bankData.DelCache(args.ctx, args.id)
-	if err3 != nil {
-		res.Error(code.UNKNOWN_ERROR, err3.Error())
+	if result.MatchedCount == 0 {
+		resp.Error(code.DATA_NOT_FIND, "No match document")
 		return
 	}
 
-	context := &bankData.Content{
-		Coin:     args.coin,
-		Faith:    args.faith,
-		Gems:     args.gems,
-		Treasure: args.treasure,
+	cache := userData.Exists(args.ctx, args.id)
+	if cache != nil {
+		cache.Bank.Coin = args.coin
+		cache.Bank.Faith = args.faith
+		cache.Bank.Gems = args.gems
+		cache.Bank.Treasure = args.treasure
+		userData.SetCache(args.id, cache)
 	}
 
-	data, err4 := bankData.SetCache(args.id, context)
-	if err4 != nil {
-		res.Error(code.UNKNOWN_ERROR, err4.Error())
-		return
+	resp.Data = &Result{
+		Bank: bankData.Content{
+			Coin:     args.coin,
+			Faith:    args.faith,
+			Gems:     args.gems,
+			Treasure: args.treasure,
+		},
 	}
-
-	res.Data = data
 }

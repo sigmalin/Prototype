@@ -15,5 +15,10 @@ namespace NetworkData.ApiServer
         {
 
         }
+
+        public override bool IsSuccess()
+        {
+            return base.IsSuccess() && (code == 0);
+        }
     }
 }

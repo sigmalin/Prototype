@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Services;
 using AssetLoader;
+using JsonSerializer;
 using Singleton;
 using UI;
 using Network.WebRequest.Protocol;
@@ -23,6 +24,8 @@ namespace Demo
         {
             initAssetLoader();
 
+            initJsonSerializer();
+
             initUI();
 
             initServerConnector();
@@ -32,6 +35,11 @@ namespace Demo
         {
             GameServices.AssetLoader = Singleton<AddressableLoader>.Instance;
             GameServices.AssetLoader.UpdateVersion(onProcess, onCompleted, onFailured);
+        }
+
+        void initJsonSerializer()
+        {
+            GameServices.JsonSerializer = Singleton<UnityJson>.Instance;
         }
 
         void initUI()
@@ -44,6 +52,7 @@ namespace Demo
         {
             GameServices.ApiServer = ProtocolFactory.Generate(new ApiServerProtocolOrder(apiServer));
             GameServices.ApiServer.Inject(ProviderFactory.Generate(new UnityProviderOrder()));
+            GameServices.ApiServer.Inject(GameServices.JsonSerializer);
         }
 
         void onProcess(IDownloadStatus status)

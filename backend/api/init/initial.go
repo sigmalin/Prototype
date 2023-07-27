@@ -23,3 +23,12 @@ func AllService() {
 
 	log.Printf("initial completed")
 }
+
+func Release() {
+
+	releaseRedisCache()
+
+	releaseDB()
+
+	releaseUID()
+}

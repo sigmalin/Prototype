@@ -41,4 +41,5 @@ Translations:
         |2023/02/23|Completion of the base API Server, providing sql access, session functionality|
         |2023/07/10|Code refactoring, use redis as sql cache, build program architecture rules|
         |2023/07/17|Completing the Swagger environment for API Server, removing session functionality and using json web token as authentication|
+        |2023/07/31|Code refactoring, use mongoDB as user database, build program architecture rules|
     

@@ -25,6 +25,7 @@ import (
 func main() {
 
 	initial.AllService()
+	defer initial.Release()
 
 	api.SSLService()
 }

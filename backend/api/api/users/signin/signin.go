@@ -2,23 +2,38 @@ package signin
 
 import (
 	"context"
-	"database/sql"
+	"modal/user/bankData"
 	"response"
+	"response/code"
 	"time"
 
 	"jwtGin"
-	"model/signinData"
-	"response/code"
+
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
+
+	"model/accountData"
+	"model/user/tokenData"
+	"model/userData"
 )
 
 type Arguments struct {
-	db     *sql.DB
+	db     *mongo.Database
 	ctx    context.Context
 	token  string
 	jwtMgr *jwtGin.Manager
 }
 
-func NewArguments(db *sql.DB, ctx context.Context, token string, jwtMgr *jwtGin.Manager) *Arguments {
+type userInfo = *userData.Content
+type jsonWebToken = *tokenData.Content
+
+type Result struct {
+	AccessToken string `json:"AccessToken,omitempty" example:"d704e538-4f2f-486d-a2a1-a2b0ad3b4fe7"`
+	jsonWebToken
+	userInfo
+}
+
+func NewArguments(db *mongo.Database, ctx context.Context, token string, jwtMgr *jwtGin.Manager) *Arguments {
 	return &Arguments{
 		db:     db,
 		ctx:    ctx,
@@ -27,63 +42,86 @@ func NewArguments(db *sql.DB, ctx context.Context, token string, jwtMgr *jwtGin.
 	}
 }
 
-func SignIn(args *Arguments, res *response.Body) {
-
-	userID, err := createUser(args)
-	if err != nil {
-		res.Error(code.SIGNIN_FAIURE, "createUser failure : "+err.Error())
-		return
-	}
-
-	err1 := createBank(args, userID)
+func SignIn(args *Arguments, resp *response.Body) {
+	id, err1 := createAccount(args)
 	if err1 != nil {
-		res.Error(code.SIGNIN_FAIURE, "createBank failure : "+err1.Error())
+		resp.Error(code.SIGNIN_FAIURE, err1.Error())
 		return
 	}
 
-	data, err2 := signinData.NewContent(args.token, userID, args.jwtMgr)
+	err2 := createUser(args, id)
 	if err2 != nil {
-		res.Error(code.SIGNIN_FAIURE, err2.Error())
+		resp.Error(code.SIGNIN_FAIURE, err2.Error())
 		return
 	}
 
-	res.Data = data
-}
+	userID := id.Hex()
 
-func createUser(args *Arguments) (int64, error) {
-
-	prepare, err1 := args.db.PrepareContext(args.ctx, "INSERT INTO Users(Token, CreateTime, UpdateTime) VALUES(?, ?, ?)")
-	if err1 != nil {
-		return 0, err1
-	}
-	defer prepare.Close()
-
-	curTime := time.Now().Unix()
-	row, err2 := prepare.ExecContext(args.ctx, args.token, curTime, curTime)
-	if err2 != nil {
-		return 0, err2
-	}
-
-	userID, err3 := row.LastInsertId()
+	info, err3 := getUserInfo(args, userID)
 	if err3 != nil {
-		return 0, err3
+		resp.Error(code.SIGNIN_FAIURE, err3.Error())
+		return
 	}
 
-	return userID, nil
+	data, err4 := getResult(args, userID, info)
+	if err4 != nil {
+		resp.Error(code.SIGNIN_FAIURE, err4.Error())
+		return
+	}
+
+	resp.Data = data
 }
 
-func createBank(args *Arguments, userID int64) error {
+func createAccount(args *Arguments) (primitive.ObjectID, error) {
 
-	prepare, err1 := args.db.PrepareContext(args.ctx, "INSERT INTO Bank(UserID, Coin, Faith, Gems, Treasure) VALUES(?, ?, ?, ?, ?)")
+	data := &accountData.Content{
+		Token:      args.token,
+		CreateTime: time.Now().Unix(),
+		UpdateTime: time.Now().Unix(),
+	}
+
+	result, err := args.db.Collection("accounts").InsertOne(args.ctx, data)
+	if err != nil {
+		return primitive.NilObjectID, err
+	}
+
+	return result.InsertedID.(primitive.ObjectID), nil
+
+}
+
+func createUser(args *Arguments, id primitive.ObjectID) error {
+
+	bankData, err1 := bankData.NewContent()
 	if err1 != nil {
 		return err1
 	}
-	defer prepare.Close()
 
-	_, err2 := prepare.ExecContext(args.ctx, userID, 1000, 0, 0, 0)
+	data := &userData.Content{
+		ID:   id,
+		Bank: *bankData,
+	}
+
+	_, err2 := args.db.Collection("users").InsertOne(args.ctx, data)
 	if err2 != nil {
 		return err2
 	}
 
 	return nil
+}
+
+func getUserInfo(args *Arguments, id string) (*userData.Content, error) {
+	return userData.GetCache(args.ctx, args.db, id)
+}
+
+func getResult(args *Arguments, id string, info *userData.Content) (*Result, error) {
+	token, err := tokenData.NewContent(id, args.jwtMgr)
+	if err != nil {
+		return nil, err
+	}
+
+	return &Result{
+		AccessToken:  args.token,
+		jsonWebToken: token,
+		userInfo:     info,
+	}, nil
 }

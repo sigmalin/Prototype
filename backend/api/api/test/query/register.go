@@ -9,5 +9,5 @@ func RegisterSubEndPoints(group *gin.RouterGroup) {
 	h := newHandler()
 
 	group.Group("/query").
-		GET("allusers", h.allUsers)
+		POST("allusers", h.allUsers)
 }

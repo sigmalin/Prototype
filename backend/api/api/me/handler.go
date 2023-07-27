@@ -8,22 +8,21 @@ import (
 	"response"
 	"response/code"
 
-	"database/sql"
-
 	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/mongo"
 
-	"connect/db"
+	db "connect/mongo"
 	"jwtGin"
 )
 
 type handler struct {
-	mainDB *sql.DB
+	mainDB *mongo.Database
 	jwtMgr *jwtGin.Manager
 }
 
 func newHandler() *handler {
 	return &handler{
-		mainDB: db.GetDB(config.SQL_DATABASE),
+		mainDB: db.GetDB(config.DATABASE_TABLE),
 		jwtMgr: jwtGin.NewManager(config.JWT_SIGNING_KEY),
 	}
 }
@@ -32,11 +31,11 @@ func (h *handler) newResponse() *response.Body {
 	return &response.Body{Code: code.SUCCESS, Message: ""}
 }
 
-func (h *handler) send(c *gin.Context, res *response.Body) {
-	if res.Code == code.SUCCESS {
-		c.JSON(http.StatusOK, res)
+func (h *handler) send(c *gin.Context, resp *response.Body) {
+	if resp.Code == code.SUCCESS {
+		c.JSON(http.StatusOK, resp)
 	} else {
-		c.JSON(http.StatusBadRequest, res)
+		c.JSON(http.StatusBadRequest, resp)
 	}
 }
 
@@ -44,21 +43,21 @@ func (h *handler) send(c *gin.Context, res *response.Body) {
 // @Tags me
 // @version 1.0
 // @produce application/json
-// @Success 200 {object} response.Body{data=bankData.Content} "Success"
+// @Success 200 {object} response.Body{data=bank.Result} "Success"
 // @Router /me/bank [get]
 // @Security Bearer
 func (h *handler) bank(c *gin.Context) {
 
-	res := h.newResponse()
+	resp := h.newResponse()
 
 	claims, exist := c.Get(config.JWT_CLAIMS_KEY)
 	if !exist {
-		res.Error(code.SESSION_FAIURE, "session failure")
-		h.send(c, res)
+		resp.Error(code.SESSION_FAIURE, "session failure")
+		h.send(c, resp)
 		return
 	}
 
-	ctx, cancel := context.WithTimeout(c.Request.Context(), config.SQL_TIMEOUT)
+	ctx, cancel := context.WithTimeout(c.Request.Context(), config.DATABASE_TIMEOUT)
 	defer cancel()
 
 	args := bank.NewArguments(
@@ -67,7 +66,7 @@ func (h *handler) bank(c *gin.Context) {
 		claims.(*jwtGin.Claims).ID,
 	)
 
-	bank.Bank(args, res)
+	bank.Bank(args, resp)
 
-	h.send(c, res)
+	h.send(c, resp)
 }

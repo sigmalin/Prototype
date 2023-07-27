@@ -7,8 +7,6 @@ using Bind.Presenter;
 using UI;
 using System;
 using Services;
-using Singleton;
-using NetworkData.ApiServer.Model.me;
 
 namespace Demo.Gamebar
 {
@@ -29,7 +27,7 @@ namespace Demo.Gamebar
         {
             bankNode = PresenterMaker.Binding<BankNode>(getBindData("bankNode").Target);
 
-            bankNode.Update(Singleton<BankModel>.Instance.Data);
+            bankNode.Update();
         }
     }
 }

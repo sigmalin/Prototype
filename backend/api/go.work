@@ -17,14 +17,14 @@ use (
 	./configs
 	./init
 	./internal/pkg/cache/redis
-	./internal/pkg/connect/db
-	./internal/pkg/connect/redis
+	./internal/pkg/connect/mongo
 	./internal/pkg/jwt
 	./internal/pkg/middleware/cors
 	./internal/pkg/middleware/jwt
-	./internal/pkg/model/bank
-	./internal/pkg/model/login
-	./internal/pkg/model/signin
+	./internal/pkg/model/account
+	./internal/pkg/model/user
+	./internal/pkg/model/user/bank
+	./internal/pkg/model/user/token
 	./internal/pkg/response
 	./internal/pkg/response/code
 	./pkg/session

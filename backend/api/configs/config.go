@@ -14,18 +14,12 @@ var (
 	JWT_SIGNING_KEY string
 	JWT_CLAIMS_KEY  string
 
-	SQL_DRIVER         string
-	SQL_USERNAME       string
-	SQL_PASSWORD       string
-	SQL_ADDRESS        string
-	SQL_PORT           int
-	SQL_DATABASE       string
-	SQL_TIMEOUT        time.Duration
-	SQL_MAXLIFETIME    int
-	SQL_MAXOPENCONNECT int
-	SQL_MAXIDLECONNECT int
-	SQL_RETRYMAX       int
-	SQL_RETRYINTERVAL  time.Duration
+	DATABASE_USERNAME string
+	DATABASE_PASSWORD string
+	DATABASE_ADDRESS  string
+	DATABASE_PORTS    int
+	DATABASE_TABLE    string
+	DATABASE_TIMEOUT  time.Duration
 
 	REDIS_CACHE_ADDRESS    string
 	REDIS_CACHE_PORT       int
@@ -41,16 +35,12 @@ func init() {
 	JWT_SIGNING_KEY = os.Getenv("JWT_SIGNING_KEY")
 	JWT_CLAIMS_KEY = os.Getenv("JWT_CLAIMS_KEY")
 
-	SQL_DRIVER = os.Getenv("SQL_DRIVER")
-	SQL_USERNAME = os.Getenv("SQL_USERNAME")
-	SQL_PASSWORD = os.Getenv("SQL_PASSWORD")
-	SQL_ADDRESS = os.Getenv("SQL_ADDRESS")
-	SQL_PORT = string2int(os.Getenv("SQL_PORT"))
-	SQL_DATABASE = os.Getenv("SQL_DATABASE")
-	SQL_TIMEOUT = time.Duration(string2int(os.Getenv("SQL_TIMEOUT"))) * time.Second
-	SQL_MAXLIFETIME = string2int(os.Getenv("SQL_MAXLIFETIME"))
-	SQL_MAXOPENCONNECT = string2int(os.Getenv("SQL_MAXOPENCONNECT"))
-	SQL_MAXIDLECONNECT = string2int(os.Getenv("SQL_MAXIDLECONNECT"))
+	DATABASE_USERNAME = os.Getenv("DATABASE_USERNAME")
+	DATABASE_PASSWORD = os.Getenv("DATABASE_PASSWORD")
+	DATABASE_ADDRESS = os.Getenv("DATABASE_ADDRESS")
+	DATABASE_PORTS = string2int(os.Getenv("DATABASE_PORTS"))
+	DATABASE_TABLE = os.Getenv("DATABASE_TABLE")
+	DATABASE_TIMEOUT = time.Duration(string2int(os.Getenv("DATABASE_TIMEOUT"))) * time.Second
 
 	REDIS_CACHE_ADDRESS = os.Getenv("REDIS_CACHE_ADDRESS")
 	REDIS_CACHE_PORT = string2int(os.Getenv("REDIS_CACHE_PORT"))

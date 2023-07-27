@@ -35,15 +35,13 @@ namespace Network.WebRequest.Provider
         {
             WWWForm form = new WWWForm();
             form.SetField(field);
-
+            
             using (UnityWebRequest request = UnityWebRequest.Post(api, form))
             {
                 request.certificateHandler = new SkipCertificate();
                 request.SetRequestHeaders(header);
                 request.timeout = timeOut;
-
                 await request.SendWebRequest();
-
                 return parseResult(request);
             }
         }
@@ -51,8 +49,8 @@ namespace Network.WebRequest.Provider
         Tuple<Result, string> parseResult(UnityWebRequest request)
         {
             Tuple<Result, string> response = null;
-
-            if (request.result != UnityWebRequest.Result.Success)
+            if (request.result != UnityWebRequest.Result.Success &&
+                request.result != UnityWebRequest.Result.ProtocolError)
             {
                 response = Tuple.Create<Result, string>(Result.NetError, request.error);
             }

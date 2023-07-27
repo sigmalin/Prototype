@@ -1,15 +1,28 @@
 definitions:
-  allusers.user:
+  allusers.Result:
     properties:
-      Name:
-        example: sigma
+      CreateTime:
+        example: 1690361379
+        type: integer
+      Mail:
+        example: sigma@company.com
         type: string
       Token:
         example: d704e538-4f2f-486d-a2a1-a2b0ad3b4fe7
         type: string
-      UserID:
-        example: 7
+      UpdateTime:
+        example: 1690361379
         type: integer
+    type: object
+  api_me_bank.Result:
+    properties:
+      Bank:
+        $ref: '#/definitions/bankData.Content'
+    type: object
+  api_test_modify_bank.Result:
+    properties:
+      Bank:
+        $ref: '#/definitions/bankData.Content'
     type: object
   bankData.Content:
     properties:
@@ -26,15 +39,17 @@ definitions:
         example: 0
         type: integer
     type: object
-  helloworld.content:
+  helloworld.Result:
     properties:
-      message:
+      Message:
         example: hello world
         type: string
     type: object
-  loginData.Content:
+  login.Result:
     properties:
-      JWT:
+      Bank:
+        $ref: '#/definitions/bankData.Content'
+      JsonWebToken:
         example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
         type: string
     type: object
@@ -48,13 +63,16 @@ definitions:
         example: ""
         type: string
     type: object
-  signinData.Content:
+  signin.Result:
     properties:
-      Token:
+      AccessToken:
         example: d704e538-4f2f-486d-a2a1-a2b0ad3b4fe7
         type: string
-      login:
-        $ref: '#/definitions/loginData.Content'
+      Bank:
+        $ref: '#/definitions/bankData.Content'
+      JsonWebToken:
+        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+        type: string
     type: object
 host: 127.0.0.1:80/api
 info:
@@ -80,7 +98,7 @@ paths:
             - $ref: '#/definitions/response.Body'
             - properties:
                 data:
-                  $ref: '#/definitions/bankData.Content'
+                  $ref: '#/definitions/api_me_bank.Result'
               type: object
       security:
       - Bearer: []
@@ -99,7 +117,7 @@ paths:
             - $ref: '#/definitions/response.Body'
             - properties:
                 data:
-                  $ref: '#/definitions/helloworld.content'
+                  $ref: '#/definitions/helloworld.Result'
               type: object
       summary: Recive HelloWorld from server
       tags:
@@ -142,13 +160,24 @@ paths:
             - $ref: '#/definitions/response.Body'
             - properties:
                 data:
-                  $ref: '#/definitions/bankData.Content'
+                  $ref: '#/definitions/api_test_modify_bank.Result'
               type: object
       summary: Modify user's bank data
       tags:
       - test
   /test/query/allusers:
-    get:
+    post:
+      parameters:
+      - description: Query start
+        in: formData
+        name: start
+        required: true
+        type: string
+      - description: Query count
+        in: formData
+        name: count
+        required: true
+        type: string
       produces:
       - application/json
       responses:
@@ -160,7 +189,7 @@ paths:
             - properties:
                 data:
                   items:
-                    $ref: '#/definitions/allusers.user'
+                    $ref: '#/definitions/allusers.Result'
                   type: array
               type: object
       summary: Query All users
@@ -184,7 +213,7 @@ paths:
             - $ref: '#/definitions/response.Body'
             - properties:
                 data:
-                  $ref: '#/definitions/loginData.Content'
+                  $ref: '#/definitions/login.Result'
               type: object
         "400":
           description: Login Failure
@@ -205,7 +234,7 @@ paths:
             - $ref: '#/definitions/response.Body'
             - properties:
                 data:
-                  $ref: '#/definitions/signinData.Content'
+                  $ref: '#/definitions/signin.Result'
               type: object
       summary: User Signin
       tags:

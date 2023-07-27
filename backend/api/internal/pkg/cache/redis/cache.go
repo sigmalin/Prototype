@@ -23,12 +23,10 @@ func newCache() *cache.Cache {
 	})
 }
 
-func Search(key string, query func() (interface{}, error)) (interface{}, error) {
-
-	value := new(interface{})
+func Search(key string, value interface{}, query func() (interface{}, error)) error {
 
 	cacher := GetInstance()
-	err := cacher.Once(&cache.Item{
+	return cacher.Once(&cache.Item{
 		Key:   key,
 		Value: value,
 		Do: func(i *cache.Item) (interface{}, error) {
@@ -36,12 +34,31 @@ func Search(key string, query func() (interface{}, error)) (interface{}, error) 
 			return value, err
 		},
 	})
-
-	return value, err
 }
 
 func Delete(ctx context.Context, key string) error {
 
 	cacher := GetInstance()
 	return cacher.Delete(ctx, key)
+}
+
+func Exists(ctx context.Context, key string) bool {
+
+	cacher := GetInstance()
+	return cacher.Exists(ctx, key)
+}
+
+func Get(ctx context.Context, key string, value interface{}) error {
+
+	cacher := GetInstance()
+	return cacher.Get(ctx, key, value)
+}
+
+func Set(key string, value interface{}) error {
+
+	cacher := GetInstance()
+	return cacher.Set(&cache.Item{
+		Key:   key,
+		Value: value,
+	})
 }

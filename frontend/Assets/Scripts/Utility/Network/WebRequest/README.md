@@ -25,7 +25,6 @@
     |Protocol|負責處理對應不特定伺服器的回傳封包(ex.解碼、json 轉換)，轉換成前端處理的統一格式(繼承 [ServerResponse](./Response/README.md) 結構)|
     |Provider|負責處理向伺服器發送 Requst 的功能，目前提供 Get、Post|
     |Response|前端處理的統一格式，需要繼承 [ServerResponse](./Response/README.md) 結構|
-    |Model|負責包裝 Response Body 的資料內容，提供本地端的讀(寫)功能|
 
 
 

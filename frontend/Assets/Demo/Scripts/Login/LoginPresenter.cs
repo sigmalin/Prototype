@@ -7,7 +7,10 @@ using UI;
 using System;
 using Services;
 using Singleton;
-using NetworkData.ApiServer.Model.users;
+using Network.WebRequest.Response;
+using NetworkData.ApiServer;
+using NetworkData.ApiServer.Element.users;
+using NetworkData.ApiServer.Model;
 
 namespace Demo.Login
 {
@@ -16,6 +19,10 @@ namespace Demo.Login
         public override string ViewPath => "Login.prefab";
 
         public override ViewLayer Layer => ViewLayer.BackGround;
+
+        const string apiLogin = "users/login";
+
+        const string apiSignin = "users/signin";
 
         AccessTokenNode accessToken;
         TouchAreaNode touchArea;
@@ -45,32 +52,53 @@ namespace Demo.Login
             }
         }
 
+        void showMessage(string msg, Action callback)
+        {
+            GameServices.UI.Open<Messagebox.MessageboxPresenter>()
+                .SetContent(msg, callback);
+        }
+
         async void logInHandle(string token)
         {
-            var model = Singleton<LoginModel>.Instance;
-            await model.Update(accessToken.GetAccessToken());
-
-            if (model.Data != null)
+            Dictionary<string, string> field = new Dictionary<string, string>()
             {
-                setLoginData(model.Data);
+                { "token", token },
+            };
+
+            var response = await GameServices.ApiServer.Post<ApiServerResponse<LoginData>>(apiLogin, field);
+            if (response.IsSuccess() == false)
+            {
+                showMessage($"Failure! Error Code = {response.code}", null);
+                return;
             }
+
+            var model = Singleton<Profile>.Instance;
+            model.setBank(response.data.Bank);
+
+            setAuthData(response.data.JsonWebToken);
         }
 
         async void signInHandle()
         {
-            var model = Singleton<SigninModel>.Instance;
-            await model.Update();
-
-            if (model.Data != null)
+            var response = await GameServices.ApiServer.Get<ApiServerResponse<SigninData>>(apiSignin);
+            if (response.IsSuccess() == false)
             {
-                accessToken.SetAccessToken(model.Data.Token);
-                setLoginData(model.Data.login);
+                showMessage($"Failure! Error Code = {response.code}", null);
+                return;
             }
+
+            var model = Singleton<Profile>.Instance;
+            model.setBank(response.data.Bank);
+
+            setAuthData(response.data.JsonWebToken);
+
+            accessToken.SetAccessToken(response.data.AccessToken);
+            setAuthData(response.data.JsonWebToken);
         }
 
-        void setLoginData(login data)
+        void setAuthData(string token)
         {
-            GameServices.ApiServer.Authorization(data.JWT);
+            GameServices.ApiServer.Authorization(token);
 
             GameServices.UI.Close<LoginPresenter>();
             GameServices.UI.Open<Entrance.EntrancePresenter>();
