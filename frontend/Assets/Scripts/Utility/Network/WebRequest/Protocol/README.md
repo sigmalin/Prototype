@@ -14,7 +14,7 @@
 |:-:|:--|
 |Get|提供 Restful Api, Get 功能|
 |Post|提供 Restful Api, Post 功能|
-|Inject|指定傳輸 Request 方式|
+|Inject|指定傳輸 Request 方式 和 Json 編碼方式|
 |Authorization|設定使用者認證代碼|
 
 
