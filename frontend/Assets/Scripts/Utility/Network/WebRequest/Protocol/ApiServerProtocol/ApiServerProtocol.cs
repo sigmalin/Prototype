@@ -4,6 +4,7 @@ using System;
 using UnityEngine;
 using Network.WebRequest.Provider;
 using Network.WebRequest.Response;
+using JsonSerializer;
 using NetworkData.ApiServer;
 
 namespace Network.WebRequest.Protocol
@@ -18,6 +19,8 @@ namespace Network.WebRequest.Protocol
 
         IProvider provider;
 
+        IJson serializer;
+
         public ApiServerProtocol(ApiServerProtocolOrder order)
         {
             url = order.Url;
@@ -27,6 +30,11 @@ namespace Network.WebRequest.Protocol
         public void Inject(IProvider method)
         {
             provider = method;
+        }
+
+        public void Inject(IJson method)
+        {
+            serializer = method;
         }
 
         public void Authorization(string auth)
@@ -43,6 +51,8 @@ namespace Network.WebRequest.Protocol
 
         public async Task<T> Get<T>(string api) where T : ServerResponse
         {
+            Debug.Log($"[GET] {api}");
+
             var response = await provider.Get($"{url}/{api}", header);
 
             return parseResponse<T>(api, response);
@@ -50,6 +60,8 @@ namespace Network.WebRequest.Protocol
 
         public async Task<T> Post<T>(string api, Dictionary<string, string> field) where T : ServerResponse
         {
+            Debug.Log($"[POST] {api} = {serializer.Serialize(field)}");
+
             var response = await provider.Post($"{url}/{api}", field, header);            
             return parseResponse<T>(api, response);
         }
@@ -70,7 +82,7 @@ namespace Network.WebRequest.Protocol
 
         T parseContent<T>(string json) where T : ServerResponse
         {
-            return JsonUtility.FromJson<T>(json);
+            return serializer.Deserialize<T>(json);
         }
     }
 }

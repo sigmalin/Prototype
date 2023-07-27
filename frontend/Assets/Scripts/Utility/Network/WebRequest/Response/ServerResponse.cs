@@ -13,6 +13,11 @@ namespace Network.WebRequest.Response
         {
             Result = result;
         }
+
+        public virtual bool IsSuccess()
+        {
+            return Result == Result.Success;
+        }
     }
 
     public enum Result

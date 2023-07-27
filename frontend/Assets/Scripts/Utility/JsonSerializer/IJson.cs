@@ -4,11 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Network.WebRequest.Model
+namespace JsonSerializer
 {
-    public interface IModel
+    public interface IJson
     {
-        void SaveLocal();
-        void LoadLocal();
+        T Deserialize<T>(string json);
+        string Serialize(object obj);
     }
 }
