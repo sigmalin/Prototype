@@ -95,4 +95,6 @@ docker volume ls
 docker volume rm <名稱>
 ```
 
+- 為什麼不使用 nginx 做反向代理
 
+因為使用 nginx 做反向代理會發生靜態資源存取失敗(*.css,*.js...)，需要對這些靜態資源做轉向，但目前已提供 swagger ui 做反向代理，如果設定資源轉向，會造成 swagger ui 顯示錯誤

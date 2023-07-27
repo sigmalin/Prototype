@@ -44,7 +44,7 @@
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/bankData.Content"
+                                            "$ref": "#/definitions/api_me_bank.Result"
                                         }
                                     }
                                 }
@@ -75,7 +75,7 @@
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/helloworld.content"
+                                            "$ref": "#/definitions/helloworld.Result"
                                         }
                                     }
                                 }
@@ -143,7 +143,7 @@
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/bankData.Content"
+                                            "$ref": "#/definitions/api_test_modify_bank.Result"
                                         }
                                     }
                                 }
@@ -154,7 +154,7 @@
             }
         },
         "/test/query/allusers": {
-            "get": {
+            "post": {
                 "produces": [
                     "application/json"
                 ],
@@ -162,6 +162,22 @@
                     "test"
                 ],
                 "summary": "Query All users",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Query start",
+                        "name": "start",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Query count",
+                        "name": "count",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "Success",
@@ -176,7 +192,7 @@
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/allusers.user"
+                                                "$ref": "#/definitions/allusers.Result"
                                             }
                                         }
                                     }
@@ -217,7 +233,7 @@
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/loginData.Content"
+                                            "$ref": "#/definitions/login.Result"
                                         }
                                     }
                                 }
@@ -254,7 +270,7 @@
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/signinData.Content"
+                                            "$ref": "#/definitions/signin.Result"
                                         }
                                     }
                                 }
@@ -266,20 +282,40 @@
         }
     },
     "definitions": {
-        "allusers.user": {
+        "allusers.Result": {
             "type": "object",
             "properties": {
-                "Name": {
+                "CreateTime": {
+                    "type": "integer",
+                    "example": 1690361379
+                },
+                "Mail": {
                     "type": "string",
-                    "example": "sigma"
+                    "example": "sigma@company.com"
                 },
                 "Token": {
                     "type": "string",
                     "example": "d704e538-4f2f-486d-a2a1-a2b0ad3b4fe7"
                 },
-                "UserID": {
+                "UpdateTime": {
                     "type": "integer",
-                    "example": 7
+                    "example": 1690361379
+                }
+            }
+        },
+        "api_me_bank.Result": {
+            "type": "object",
+            "properties": {
+                "Bank": {
+                    "$ref": "#/definitions/bankData.Content"
+                }
+            }
+        },
+        "api_test_modify_bank.Result": {
+            "type": "object",
+            "properties": {
+                "Bank": {
+                    "$ref": "#/definitions/bankData.Content"
                 }
             }
         },
@@ -304,19 +340,22 @@
                 }
             }
         },
-        "helloworld.content": {
+        "helloworld.Result": {
             "type": "object",
             "properties": {
-                "message": {
+                "Message": {
                     "type": "string",
                     "example": "hello world"
                 }
             }
         },
-        "loginData.Content": {
+        "login.Result": {
             "type": "object",
             "properties": {
-                "JWT": {
+                "Bank": {
+                    "$ref": "#/definitions/bankData.Content"
+                },
+                "JsonWebToken": {
                     "type": "string",
                     "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
                 }
@@ -336,15 +375,19 @@
                 }
             }
         },
-        "signinData.Content": {
+        "signin.Result": {
             "type": "object",
             "properties": {
-                "Token": {
+                "AccessToken": {
                     "type": "string",
                     "example": "d704e538-4f2f-486d-a2a1-a2b0ad3b4fe7"
                 },
-                "login": {
-                    "$ref": "#/definitions/loginData.Content"
+                "Bank": {
+                    "$ref": "#/definitions/bankData.Content"
+                },
+                "JsonWebToken": {
+                    "type": "string",
+                    "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
                 }
             }
         }

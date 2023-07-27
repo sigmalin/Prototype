@@ -2,48 +2,59 @@ package allusers
 
 import (
 	"context"
-	"database/sql"
+	"model/accountData"
 
 	"response"
 	"response/code"
+
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-type user struct {
-	UserID int    `json:"UserID" example:"7"`
-	Token  string `json:"Token" example:"d704e538-4f2f-486d-a2a1-a2b0ad3b4fe7"`
-	Name   string `json:"Name" example:"sigma"`
+type Arguments struct {
+	db    *mongo.Database
+	ctx   context.Context
+	start int64
+	count int64
 }
 
-func Handle(ctx context.Context, db *sql.DB, res *response.Body) {
+type Result = accountData.Content
 
-	prepare, err1 := db.PrepareContext(ctx, "SELECT UserID, Token, Name From Users")
+func NewArguments(db *mongo.Database, ctx context.Context, start int64, count int64) *Arguments {
+	return &Arguments{
+		db:    db,
+		ctx:   ctx,
+		start: start,
+		count: count,
+	}
+}
+
+func Handle(args *Arguments, resp *response.Body) {
+
+	opts := options.Find()
+	opts.SetSkip(args.start)
+	opts.SetLimit(args.count)
+
+	cursor, err1 := args.db.Collection("accounts").Find(args.ctx, bson.D{{}}, opts)
 	if err1 != nil {
-		res.Error(code.UNKNOWN_ERROR, err1.Error())
+		resp.Error(code.UNKNOWN_ERROR, err1.Error())
 		return
 	}
-	defer prepare.Close()
-
-	rows, err2 := prepare.QueryContext(ctx)
-	if err2 != nil {
-		res.Error(code.UNKNOWN_ERROR, err2.Error())
-		return
-	}
-
-	users := []user{}
-	for rows.Next() {
-		u := &user{}
-		if err := rows.Scan(&u.UserID, &u.Token, &u.Name); err != nil {
-			res.Error(code.UNKNOWN_ERROR, err.Error())
+	defer func() {
+		err := cursor.Close(context.Background())
+		if err != nil {
+			resp.Error(code.UNKNOWN_ERROR, err.Error())
 			return
 		}
-		users = append(users, *u)
-	}
+	}()
 
-	err3 := rows.Err()
-	if err3 != nil {
-		res.Error(code.UNKNOWN_ERROR, err3.Error())
+	var results []Result
+	err2 := cursor.All(args.ctx, &results)
+	if err2 != nil {
+		resp.Error(code.UNKNOWN_ERROR, err2.Error())
 		return
 	}
 
-	res.Data = users
+	resp.Data = results
 }

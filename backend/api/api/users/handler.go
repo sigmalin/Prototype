@@ -7,13 +7,13 @@ import (
 	"response"
 	"response/code"
 
-	"database/sql"
-
 	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/mongo"
 
-	"connect/db"
 	"jwtGin"
 	"uid"
+
+	db "connect/mongo"
 
 	"api/users/login"
 	"api/users/signin"
@@ -21,14 +21,14 @@ import (
 
 type handler struct {
 	generator uid.Generator
-	mainDB    *sql.DB
+	mainDB    *mongo.Database
 	jwtMgr    *jwtGin.Manager
 }
 
 func newHandler() *handler {
 	return &handler{
 		generator: uid.GetGenerator(config.UID_GENERATOR_KEY),
-		mainDB:    db.GetDB(config.SQL_DATABASE),
+		mainDB:    db.GetDB(config.DATABASE_TABLE),
 		jwtMgr:    jwtGin.NewManager(config.JWT_SIGNING_KEY),
 	}
 }
@@ -37,11 +37,11 @@ func (h *handler) newResponse() *response.Body {
 	return &response.Body{Code: code.SUCCESS, Message: ""}
 }
 
-func (h *handler) send(c *gin.Context, res *response.Body) {
-	if res.Code == code.SUCCESS {
-		c.JSON(http.StatusOK, res)
+func (h *handler) send(c *gin.Context, resp *response.Body) {
+	if resp.Code == code.SUCCESS {
+		c.JSON(http.StatusOK, resp)
 	} else {
-		c.JSON(http.StatusBadRequest, res)
+		c.JSON(http.StatusBadRequest, resp)
 	}
 }
 
@@ -54,14 +54,14 @@ func (h *handler) newToken() string {
 // @Tags users
 // @version 1.0
 // @produce application/json
-// @Success 200 {object} response.Body{data=signinData.Content} "Success"
+// @Success 200 {object} response.Body{data=signin.Result} "Success"
 // @Router /users/signin [get]
 func (h *handler) signin(c *gin.Context) {
 
-	ctx, cancel := context.WithTimeout(c.Request.Context(), config.SQL_TIMEOUT)
+	ctx, cancel := context.WithTimeout(c.Request.Context(), config.DATABASE_TIMEOUT)
 	defer cancel()
 
-	res := h.newResponse()
+	resp := h.newResponse()
 
 	args := signin.NewArguments(
 		h.mainDB,
@@ -69,9 +69,9 @@ func (h *handler) signin(c *gin.Context) {
 		h.newToken(),
 		h.jwtMgr)
 
-	signin.SignIn(args, res)
+	signin.SignIn(args, resp)
 
-	h.send(c, res)
+	h.send(c, resp)
 }
 
 // @Summary User Login
@@ -79,14 +79,14 @@ func (h *handler) signin(c *gin.Context) {
 // @version 1.0
 // @produce application/json
 // @Param token formData string true "login token"
-// @Success 200 {object} response.Body{data=loginData.Content} "Success"
+// @Success 200 {object} response.Body{data=login.Result} "Success"
 // @Failure 400 {object} response.Body "Login Failure"
 // @Router /users/login [post]
 func (h *handler) login(c *gin.Context) {
 
 	token := c.PostForm("token")
 
-	ctx, cancel := context.WithTimeout(c.Request.Context(), config.SQL_TIMEOUT)
+	ctx, cancel := context.WithTimeout(c.Request.Context(), config.DATABASE_TIMEOUT)
 	defer cancel()
 
 	res := h.newResponse()

@@ -17,3 +17,7 @@ func initRedisCache(wg *sync.WaitGroup) {
 
 	log.Printf("redis cache completed")
 }
+
+func releaseRedisCache() {
+
+}

@@ -21,11 +21,11 @@ func (h *handler) newResponse() *response.Body {
 	return &response.Body{Code: code.SUCCESS, Message: ""}
 }
 
-func (h *handler) send(c *gin.Context, res *response.Body) {
-	if res.Code == code.SUCCESS {
-		c.JSON(http.StatusOK, res)
+func (h *handler) send(c *gin.Context, resp *response.Body) {
+	if resp.Code == code.SUCCESS {
+		c.JSON(http.StatusOK, resp)
 	} else {
-		c.JSON(http.StatusBadRequest, res)
+		c.JSON(http.StatusBadRequest, resp)
 	}
 }
 
@@ -33,13 +33,13 @@ func (h *handler) send(c *gin.Context, res *response.Body) {
 // @Tags test
 // @version 1.0
 // @produce application/json
-// @Success 200 {object} response.Body{data=helloworld.content} "Success"
+// @Success 200 {object} response.Body{data=helloworld.Result} "Success"
 // @Router /test/helloworld [get]
 func (h *handler) helloworld(c *gin.Context) {
 
-	res := h.newResponse()
+	resp := h.newResponse()
 
-	helloworld.Handle(res)
+	helloworld.Handle(resp)
 
-	h.send(c, res)
+	h.send(c, resp)
 }

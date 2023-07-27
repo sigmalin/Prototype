@@ -1,6 +1,10 @@
 # 使用版本 3.3
 version: '3.3'
 
+#定義 volumes 的區塊，供 service 內指定容器使用
+volumes:
+    mongoData:
+
 #定義 service 的區塊，一個 service 設定可以用來啟動多個容器
 services:
     #定義啟動的容器名稱
@@ -26,16 +30,12 @@ services:
             SSL_PRIVATE_KEY: ./ssl/server.key 
             JWT_SIGNING_KEY: SIGMA_SIGNING_KEY
             JWT_CLAIMS_KEY: JWT_CLAIMS
-            SQL_DRIVER: mysql
-            SQL_USERNAME: root
-            SQL_PASSWORD: 1111
-            SQL_ADDRESS: go_db
-            SQL_PORT: 3306
-            SQL_DATABASE: main_db
-            SQL_TIMEOUT: 5
-            SQL_MAXLIFETIME: 10
-            SQL_MAXOPENCONNECT: 1
-            SQL_MAXIDLECONNECT: 1
+            DATABASE_USERNAME: root
+            DATABASE_PASSWORD: 1111
+            DATABASE_ADDRESS: go_db
+            DATABASE_PORTS: 27017
+            DATABASE_TABLE: main_db
+            DATABASE_TIMEOUT: 5
             REDIS_CACHE_ADDRESS: go_redis
             REDIS_CACHE_PORT: 6379
             REDIS_CACHE_EXPIRATION: 600
@@ -44,14 +44,15 @@ services:
     #定義啟動的DB名稱
     go_db:
         #image 來源
-        image: mariadb
+        image: mongo
         container_name: GoDatabase
         ports:
-            - 37002:3306
+            - 27017:27017
         volumes:
-            - ./sql/data:/var/lib/mysql
+            - mongoData:/data/db
         environment:
-            MYSQL_ROOT_PASSWORD: 1111            
+            MONGO_INITDB_ROOT_USERNAME: root
+            MONGO_INITDB_ROOT_PASSWORD: 1111         
     #定義啟動的Redis
     go_redis:
         image: redis
@@ -83,6 +84,25 @@ services:
             - ./swagger/doc:/usr/share/nginx/html/doc
         environment:
             API_URL: doc/swagger.yaml
+    #定義啟動的 mongo-express
+    mongo_express:
+        image: mongo-express
+        container_name: GoMongoExpress
+        ports:
+            - 37005:8081
+        environment:
+            ME_CONFIG_MONGODB_SERVER: go_db
+            ME_CONFIG_MONGODB_PORT: 27017
+            ME_CONFIG_MONGODB_ADMINUSERNAME: root
+            ME_CONFIG_MONGODB_ADMINPASSWORD: 1111
+        depends_on:
+            - go_db
+        deploy:
+            #定義重新啟動規則
+            restart_policy:
+                condition: on-failure
+                delay: 5s
+                max_attempts: 3                
     #定義啟動的 nginx
     nginx:
         image: nginx:stable-alpine

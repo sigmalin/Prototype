@@ -1,12 +1,12 @@
 package initial
 
 import (
-	"config"
+	"context"
 	"log"
 	"sync"
 	"time"
 
-	connector "connect/db"
+	connector "connect/mongo"
 )
 
 func initDB(wg *sync.WaitGroup) {
@@ -16,8 +16,8 @@ func initDB(wg *sync.WaitGroup) {
 	log.Printf("start DB")
 
 	for {
-		db := connector.GetDB(config.SQL_DATABASE)
-		if db != nil {
+		err := connector.NewClient(context.TODO())
+		if err == nil {
 			break
 		}
 
@@ -25,4 +25,8 @@ func initDB(wg *sync.WaitGroup) {
 	}
 
 	log.Printf("DB completed")
+}
+
+func releaseDB() {
+	connector.Release(context.TODO())
 }

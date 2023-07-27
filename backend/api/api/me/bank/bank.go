@@ -2,19 +2,25 @@ package bank
 
 import (
 	"context"
-	"database/sql"
-	"modal/bankData"
+	"modal/user/bankData"
+	"model/userData"
 	"response"
 	"response/code"
+
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type Arguments struct {
-	db  *sql.DB
+	db  *mongo.Database
 	ctx context.Context
 	id  string
 }
 
-func NewArguments(db *sql.DB, ctx context.Context, id string) *Arguments {
+type Result struct {
+	Bank bankData.Content `json:"Bank"`
+}
+
+func NewArguments(db *mongo.Database, ctx context.Context, id string) *Arguments {
 	return &Arguments{
 		db:  db,
 		ctx: ctx,
@@ -22,14 +28,16 @@ func NewArguments(db *sql.DB, ctx context.Context, id string) *Arguments {
 	}
 }
 
-func Bank(args *Arguments, res *response.Body) {
+func Bank(args *Arguments, resp *response.Body) {
 
-	data, err := bankData.GetCache(args.ctx, args.db, args.id)
+	data, err := userData.GetCache(args.ctx, args.db, args.id)
 
 	if err != nil {
-		res.Error(code.DATA_NOT_FIND, err.Error())
+		resp.Error(code.DATA_NOT_FIND, err.Error())
 		return
 	}
 
-	res.Data = data
+	result := &Result{Bank: data.Bank}
+
+	resp.Data = result
 }

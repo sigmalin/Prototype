@@ -5,13 +5,13 @@ import (
 	"response/code"
 )
 
-type content struct {
-	Message string `json:"message" example:"hello world"`
+type Result struct {
+	Message string `json:"Message" example:"hello world"`
 }
 
-func Handle(res *response.Body) {
+func Handle(resp *response.Body) {
 
-	res.Code = code.SUCCESS
-	res.Message = ""
-	res.Data = &content{Message: "hello world"}
+	resp.Code = code.SUCCESS
+	resp.Message = ""
+	resp.Data = &Result{Message: "hello world"}
 }

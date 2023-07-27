@@ -8,22 +8,21 @@ import (
 	"response/code"
 	"strconv"
 
-	"database/sql"
-
 	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/mongo"
 
-	"connect/db"
+	db "connect/mongo"
 
 	"api/test/modify/bank"
 )
 
 type handler struct {
-	mainDB *sql.DB
+	mainDB *mongo.Database
 }
 
 func newHandler() *handler {
 	return &handler{
-		mainDB: db.GetDB(config.SQL_DATABASE),
+		mainDB: db.GetDB(config.DATABASE_TABLE),
 	}
 }
 
@@ -31,11 +30,11 @@ func (h *handler) newResponse() *response.Body {
 	return &response.Body{Code: code.SUCCESS, Message: ""}
 }
 
-func (h *handler) send(c *gin.Context, res *response.Body) {
-	if res.Code == code.SUCCESS {
-		c.JSON(http.StatusOK, res)
+func (h *handler) send(c *gin.Context, resp *response.Body) {
+	if resp.Code == code.SUCCESS {
+		c.JSON(http.StatusOK, resp)
 	} else {
-		c.JSON(http.StatusBadRequest, res)
+		c.JSON(http.StatusBadRequest, resp)
 	}
 }
 
@@ -48,7 +47,7 @@ func (h *handler) send(c *gin.Context, res *response.Body) {
 // @Param Faith formData string true "Faith"
 // @Param Gems formData string true "Gems"
 // @Param Treasures formData string true "Treasures"
-// @Success 200 {object} response.Body{data=bankData.Content} "Success"
+// @Success 200 {object} response.Body{data=bank.Result} "Success"
 // @Router /test/modify/bank [post]
 func (h *handler) bank(c *gin.Context) {
 
@@ -58,10 +57,10 @@ func (h *handler) bank(c *gin.Context) {
 	gems := c.PostForm("Gems")
 	treasure := c.PostForm("Treasures")
 
-	ctx, cancel := context.WithTimeout(c.Request.Context(), config.SQL_TIMEOUT)
+	ctx, cancel := context.WithTimeout(c.Request.Context(), config.DATABASE_TIMEOUT)
 	defer cancel()
 
-	res := h.newResponse()
+	resp := h.newResponse()
 
 	args := bank.NewArguments(
 		h.mainDB,
@@ -70,9 +69,9 @@ func (h *handler) bank(c *gin.Context) {
 		h.parseValue(coin), h.parseValue(faith),
 		h.parseValue(gems), h.parseValue(treasure))
 
-	bank.Handle(args, res)
+	bank.Handle(args, resp)
 
-	h.send(c, res)
+	h.send(c, resp)
 }
 
 func (h *handler) parseValue(data string) int64 {

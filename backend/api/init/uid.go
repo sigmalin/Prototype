@@ -19,3 +19,7 @@ func initUID(wg *sync.WaitGroup) {
 
 	log.Printf("uid completed")
 }
+
+func releaseUID() {
+
+}
