@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package helloWorld;
+option go_package = "proto/helloWorld";
+option csharp_namespace = "Protobufs.helloWorld";
+
+message HelloWorldRequest {
+    string me = 1;
+}
+
+message HelloWorldResponse {
+    string msg = 1;
+}
+
+service HelloWorldService {
+    rpc Say(HelloWorldRequest) returns (HelloWorldResponse);
+}
