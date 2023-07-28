@@ -26,6 +26,7 @@ Translations:
         |2023/02/23|Completion of the communication with the back-end functionality template|
         |2023/06/02|Code refactoring, UI management, resource downloads and network communication features|
         |2023/07/19|Update the demo template of basic operations to communicate with the back-end|
+<br>
 
 
 - backend :
@@ -42,4 +43,17 @@ Translations:
         |2023/07/10|Code refactoring, use redis as sql cache, build program architecture rules|
         |2023/07/17|Completing the Swagger environment for API Server, removing session functionality and using json web token as authentication|
         |2023/07/31|Code refactoring, use mongoDB as user database, build program architecture rules|
+<br>
+
+- grpc :
+
+    - info :
+
+       gRPC code generator, separate folders for front-end and back-end generation
+
+    - logs :
+
+        | Date | News |
+        |:-:|:--|
+        |2023/07/24|Completion of front-end and back-end code generation settings|
     

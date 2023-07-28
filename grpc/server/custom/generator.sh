@@ -1,0 +1,1 @@
+docker run --rm -v $(pwd):/go/src/app -w /go/src/app prototype/proto-builder sh -c 'protoc src/*.proto --go_out=./grpc --go-grpc_out=./grpc'

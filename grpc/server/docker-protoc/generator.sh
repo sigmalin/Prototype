@@ -1,0 +1,1 @@
+docker run --rm -v ${PWD}:/defs namely/protoc-all -l go -d ./src -o ./grpc
