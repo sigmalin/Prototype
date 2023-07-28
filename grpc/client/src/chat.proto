@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package chat
+option go_package = "proto/chat";
+option csharp_namespace = "Protobufs.chat";
+
+message TalkRequest {
+    string name = 1;
+    string msg = 2;
+}
+
+message TalkResponse {
+    string msg = 1;
+}
+
+message ListenRequest {
+    string name = 1;
+}
+
+message ListenResponse {
+    string name = 1;
+    string msg = 2;
+}
+
+service ChatService {
+    rpc Talk(TalkRequest) returns (TalkResponse);
+    rpc Listen(ListenRequest) return (stream ListenResponse);
+}
