@@ -116,3 +116,15 @@ services:
             - ./ssl:/etc/nginx/cert
         depends_on:
             - swagger_ui
+    #定義啟動的 gRPC
+    go_grpc:
+        # 編譯檔來源
+        build:
+            context: ./grpc
+            dockerfile: ./Dockerfile
+        #輸出影像檔案名稱
+        image: service/grpc_server
+        container_name: GoGRPC
+        #開放的 Port
+        ports:
+            - 5033:5033
